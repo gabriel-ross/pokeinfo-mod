@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import okhttp3.OkHttpClient
+import org.gabrielross.api.Pokeinfo
 import org.gabrielross.client.Client
 import org.slf4j.LoggerFactory
 
@@ -31,7 +32,7 @@ object PokeInfo : ModInitializer {
 //        println(resp.body!!.string())
 //        println(UnmarshalStrategy.decodeFromString<pokemonresponse>(resp.body!!.string()))
 
-        val pokeinfo = PokeinfoAPI(Client(baseUrl, baseHTTPClient))
+        val pokeinfo = Pokeinfo(Client(baseUrl, baseHTTPClient))
 //        println(pokeinfo.getPokemon("scizor").Data().toString())
 
         CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->

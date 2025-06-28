@@ -21,69 +21,39 @@ open class Client constructor(
     val growthRateEndpoint = "growth-rate"
     val eggGroupEndpoint = "egg-group"
 
-    fun getPokemon(id: Int): PokemonResponse {
+    fun getPokemon(identifier: String): PokemonResponse {
         return UnmarshalStrategy.decodeFromString<PokemonResponse>(
-            this.makePokeAPIRequest("${this.pokemonEndpoint}/$id").string()
+            this.makePokeAPIRequest("${this.pokemonEndpoint}/$identifier").string()
         )
     }
 
-    fun getPokemon(name: String): PokemonResponse {
-        return UnmarshalStrategy.decodeFromString<PokemonResponse>(
-            this.makePokeAPIRequest("${this.pokemonEndpoint}/$name").string()
-        )
-    }
-
-    fun getMove(id: Int): MoveResponse {
+    fun getMove(identifier: String): MoveResponse {
         return UnmarshalStrategy.decodeFromString<MoveResponse>(
-            this.makePokeAPIRequest("${this.moveEndpoint}/$id").string()
+            this.makePokeAPIRequest("${this.moveEndpoint}/$identifier").string()
         )
     }
 
-    fun getMove(name: String): MoveResponse {
-        return UnmarshalStrategy.decodeFromString<MoveResponse>(
-            this.makePokeAPIRequest("${this.moveEndpoint}/$name").string()
-        )
-    }
-
-    fun getAbility(id: Int): AbilityResponse {
+    fun getAbility(identifier: String): AbilityResponse {
         return UnmarshalStrategy.decodeFromString<AbilityResponse>(
-            this.makePokeAPIRequest("${this.abilityEndpoint}/$id").string()
-        )
-    }
-
-    fun getAbility(name: String): AbilityResponse {
-        return UnmarshalStrategy.decodeFromString<AbilityResponse>(
-            this.makePokeAPIRequest("${this.abilityEndpoint}/$name").string()
+            this.makePokeAPIRequest("${this.abilityEndpoint}/$identifier").string()
         )
     }
 
     fun getType(type: Type): TypeResponse {
         return UnmarshalStrategy.decodeFromString<TypeResponse>(
-            this.makePokeAPIRequest("${this.baseUrl}/$type").string()
+            this.makePokeAPIRequest("${this.baseUrl}/${this.typeEndpoint}/$type").string()
         )
     }
 
-    fun getEggGroup(name: String): EggGroupResponse {
+    fun getEggGroup(identifier: String): EggGroupResponse {
         return UnmarshalStrategy.decodeFromString<EggGroupResponse>(
-            this.makePokeAPIRequest("${this.eggGroupEndpoint}/$name").string()
+            this.makePokeAPIRequest("${this.eggGroupEndpoint}/$identifier").string()
         )
     }
 
-    fun getEggGroup(id: Int): EggGroupResponse {
-        return UnmarshalStrategy.decodeFromString<EggGroupResponse>(
-            this.makePokeAPIRequest("${this.eggGroupEndpoint}/$id").string()
-        )
-    }
-
-    fun getGrowthRate(name: String): GrowthRateResponse {
+    fun getGrowthRate(identifier: String): GrowthRateResponse {
         return UnmarshalStrategy.decodeFromString<GrowthRateResponse>(
-            this.makePokeAPIRequest("${this.growthRateEndpoint}/$name").string()
-        )
-    }
-
-    fun getGrowthRate(id: Int): GrowthRateResponse {
-        return UnmarshalStrategy.decodeFromString<GrowthRateResponse>(
-            this.makePokeAPIRequest("${this.growthRateEndpoint}/$id").string()
+            this.makePokeAPIRequest("${this.growthRateEndpoint}/$identifier").string()
         )
     }
 

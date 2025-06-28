@@ -5,6 +5,28 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
 import net.minecraft.network.chat.Component
+import org.gabrielross.api.Pokeinfo
+import org.gabrielross.api.PokeinfoAPI
+
+class MoveCommand {
+    companion object {
+        fun register(dispatcher: CommandDispatcher<CommandSourceStack>) {
+            dispatcher.register(
+                Commands.literal("move")
+                    .then(
+                        Commands.argument("identifier", StringArgumentType.greedyString())
+                            .executes { ctx ->
+                                //
+                            }
+                    )
+            )
+        }
+
+        fun getMoveInfo(source: CommandSourceStack, identifier: String, pokeinfo: Pokeinfo): Int {
+            source.sendSystemMessage(Component.literal(pokeinfo.get()))
+        }
+    }
+}
 
 class BrigExampleCommand {
     companion object {
@@ -21,7 +43,6 @@ class BrigExampleCommand {
         }
 
         fun broadcast(source: CommandSourceStack, message: String): Int {
-//            source.sendSystemMessage(LiteralMessage())
             println("broadcast called")
             source.sendSystemMessage(Component.literal(message))
             return 1

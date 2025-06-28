@@ -1,19 +1,19 @@
-package org.gabrielross
+package org.gabrielross.api
 
 import org.gabrielross.client.Client
+import org.gabrielross.model.Move
 import org.gabrielross.model.Pokemon
-import org.gabrielross.model.PokemonFromAPIResponse
 
-class PokeinfoAPI(
+class Pokeinfo(
     val apiClient: Client
 ) {
 
-    fun getPokemon(name: String): Pokemon {
-        return PokemonFromAPIResponse(this.apiClient.getPokemon(name))
+    fun getPokemon(identifier: String): Pokemon {
+        return Pokemon.fromResponse(this.apiClient.getPokemon(identifier))
     }
 
-    fun getPokemon(id: Int): Pokemon {
-        return PokemonFromAPIResponse(this.apiClient.getPokemon(id))
+    fun getMove(identifier: String): Move {
+        return Move.fromResponse(this.apiClient.getMove(identifier))
     }
 
     fun getAbilityLearnset(name: String): List<String> {
