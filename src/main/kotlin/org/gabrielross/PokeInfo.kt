@@ -22,25 +22,21 @@ object PokeInfo : ModInitializer {
 
         val baseHTTPClient = OkHttpClient()
         val baseUrl = "https://pokeapi.co/api/v2"
-//
-//        val req = Request.Builder()
-//            .url("https://pokeapi.co/api/v2/pokemon/scizor")
-//            .build()
-//
-//        val resp = baseHTTPClient.newCall(req).execute()
-//        if (!resp.isSuccessful) throw IOException("error code: ${resp.code}")
-//        println(resp.body!!.string())
-//        println(UnmarshalStrategy.decodeFromString<pokemonresponse>(resp.body!!.string()))
 
         val pokeinfo = Pokeinfo(Client(baseUrl, baseHTTPClient))
-//        println(pokeinfo.getPokemon("scizor").Data().toString())
 
         CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
-            BrigExampleCommand.registerPokeInfo(dispatcher, pokeinfo)
+            PokemonCommand.register(dispatcher, pokeinfo)
         }
+
+        CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
+            MoveCommand.register(dispatcher, pokeinfo)
+        }
+
         CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
             BrigExampleCommand.register(dispatcher)
         }
+
         logger.info("Hello Fabric world!")
     }
 }

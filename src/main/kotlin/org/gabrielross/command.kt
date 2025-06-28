@@ -6,24 +6,49 @@ import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
 import net.minecraft.network.chat.Component
 import org.gabrielross.api.Pokeinfo
-import org.gabrielross.api.PokeinfoAPI
+
+class PokemonCommand {
+    companion object {
+        fun register(dispatcher: CommandDispatcher<CommandSourceStack>, pokeInfo: Pokeinfo) {
+            dispatcher.register(
+                Commands.literal("pokeinfo")
+                    .then(
+                        Commands.argument("identifier", StringArgumentType.greedyString())
+                            .executes { ctx ->
+                                getPokemon(
+                                    ctx.source,
+                                    StringArgumentType.getString(ctx, "identifier"),
+                                    pokeInfo
+                                )
+                            }
+                    )
+            )
+        }
+
+        fun getPokemon(source: CommandSourceStack, identifier: String, pokeinfo: Pokeinfo): Int {
+            source.sendSystemMessage(Component.literal(pokeinfo.getPokemon(identifier).Data().toString()))
+            return 1
+        }
+    }
+}
 
 class MoveCommand {
     companion object {
-        fun register(dispatcher: CommandDispatcher<CommandSourceStack>) {
+        fun register(dispatcher: CommandDispatcher<CommandSourceStack>, pokeinfo: Pokeinfo) {
             dispatcher.register(
                 Commands.literal("move")
                     .then(
                         Commands.argument("identifier", StringArgumentType.greedyString())
                             .executes { ctx ->
-                                //
+                                getMoveInfo(ctx.source, StringArgumentType.getString(ctx, "identifier"), pokeinfo)
                             }
                     )
             )
         }
 
         fun getMoveInfo(source: CommandSourceStack, identifier: String, pokeinfo: Pokeinfo): Int {
-            source.sendSystemMessage(Component.literal(pokeinfo.get()))
+            source.sendSystemMessage(Component.literal(pokeinfo.getMove(identifier).Data().toString()))
+            return 1
         }
     }
 }
@@ -45,27 +70,6 @@ class BrigExampleCommand {
         fun broadcast(source: CommandSourceStack, message: String): Int {
             println("broadcast called")
             source.sendSystemMessage(Component.literal(message))
-            return 1
-        }
-
-        fun registerPokeInfo(dispatcher: CommandDispatcher<CommandSourceStack>, pokeInfo: PokeinfoAPI) {
-            dispatcher.register(
-                Commands.literal("pokeinfo")
-                    .then(
-                        Commands.argument("identifier", StringArgumentType.greedyString())
-                            .executes { ctx ->
-                                getPokemonData(
-                                    ctx.source,
-                                    StringArgumentType.getString(ctx, "identifier"),
-                                    pokeInfo
-                                )
-                            }
-                    )
-            )
-        }
-
-        fun getPokemonData(source: CommandSourceStack, identifier: String, pokeinfo: PokeinfoAPI): Int {
-            source.sendSystemMessage(Component.literal(pokeinfo.getPokemon(identifier).Data().toString()))
             return 1
         }
     }
