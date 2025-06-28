@@ -11,7 +11,7 @@ class PokemonCommand {
     companion object {
         fun register(dispatcher: CommandDispatcher<CommandSourceStack>, pokeInfo: Pokeinfo) {
             dispatcher.register(
-                Commands.literal("pokeinfo")
+                Commands.literal("pokemon")
                     .then(
                         Commands.argument("identifier", StringArgumentType.greedyString())
                             .executes { ctx ->
