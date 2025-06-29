@@ -15,6 +15,7 @@ open class Client constructor(
     val baseUrl = baseUrl
     val httpClient = httpClient
     val pokemonEndpoint = "pokemon"
+    val speciesEndpoint = "pokemon-species"
     val moveEndpoint = "move"
     val abilityEndpoint = "ability"
     val typeEndpoint = "type"
@@ -24,6 +25,12 @@ open class Client constructor(
     fun getPokemon(identifier: String): PokemonResponse {
         return UnmarshalStrategy.decodeFromString<PokemonResponse>(
             this.makePokeAPIRequest("${this.pokemonEndpoint}/$identifier").string()
+        )
+    }
+
+    fun getPokemonSpecies(identifier: String): SpeciesResponse {
+        return UnmarshalStrategy.decodeFromString<SpeciesResponse>(
+            this.makePokeAPIRequest("${this.speciesEndpoint}/$identifier").string()
         )
     }
 

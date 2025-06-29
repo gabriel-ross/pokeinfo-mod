@@ -1,8 +1,10 @@
 package org.gabrielross.api
 
 import org.gabrielross.client.Client
+import org.gabrielross.client.response.SpeciesResponse
 import org.gabrielross.model.Move
 import org.gabrielross.model.Pokemon
+import org.gabrielross.model.SpeciesData
 
 class Pokeinfo(
     val apiClient: Client
@@ -10,6 +12,10 @@ class Pokeinfo(
 
     fun getPokemon(identifier: String): Pokemon {
         return Pokemon.fromResponse(this.apiClient.getPokemon(identifier))
+    }
+
+    fun getPokemonSpecies(identifier: String): SpeciesData {
+        return SpeciesData.fromResponse(this.apiClient.getPokemonSpecies(identifier))
     }
 
     fun getMove(identifier: String): Move {

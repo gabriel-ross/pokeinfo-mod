@@ -5,7 +5,7 @@ import org.gabrielross.constants.EggGroup
 import org.gabrielross.constants.GrowthRate
 
 @Serializable
-data class Species(
+data class SpeciesResponse(
     val id: Int,
     val name: String,
     val capture_rate: Int,

@@ -1,10 +1,38 @@
 package org.gabrielross.model
 
 import org.gabrielross.client.response.PokemonResponse
+import org.gabrielross.client.response.SpeciesResponse
 import org.gabrielross.constants.EggGroup
 import org.gabrielross.constants.GrowthRate
 import org.gabrielross.constants.MoveLearnMethod
 import org.gabrielross.constants.Type
+
+data class SpeciesData(
+    val id: Int,
+    val name: String,
+    val captureRate: Int,
+    val eggGroup1: EggGroup,
+    val eggGroup2: EggGroup?,
+    val growthRate: GrowthRate,
+) {
+    companion object {
+        fun fromResponse(data: SpeciesResponse): SpeciesData {
+            val primaryEggGroup = data.egg_groups[0].name
+            var secondaryEggGroup: EggGroup? = null
+            if (data.egg_groups.size > 1) {
+                secondaryEggGroup = data.egg_groups[1].name
+            }
+            return SpeciesData(
+                id = data.id,
+                name = data.name,
+                captureRate = data.capture_rate,
+                eggGroup1 = primaryEggGroup,
+                eggGroup2 = secondaryEggGroup,
+                growthRate = data.growth_rate.name
+            )
+        }
+    }
+}
 
 
 // Contains data for a pokemon object
