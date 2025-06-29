@@ -28,14 +28,19 @@ object PokeInfo : ModInitializer {
         CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
             PokemonCommand.register(dispatcher, pokeinfo)
         }
+//
+//        CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
+//            MoveCommand.register(dispatcher, pokeinfo)
+//        }
+//
+//        CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
+//            BrigExampleCommand.register(dispatcher)
+//        }
 
         CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
-            MoveCommand.register(dispatcher, pokeinfo)
+            DemoCommand.register(dispatcher)
         }
 
-        CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
-            BrigExampleCommand.register(dispatcher)
-        }
 
         logger.info("Hello Fabric world!")
     }

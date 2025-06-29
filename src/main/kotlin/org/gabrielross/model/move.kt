@@ -10,6 +10,7 @@ import kotlin.Int
 class Move(
     val id: Int,
     val name: String,
+    val priority: Int,
     val accuracy: Int?,
     val power: Int?,
     val pp: Int,
@@ -23,7 +24,7 @@ class Move(
             var longEffect = ""
             var shortEffect = ""
             data.effect_entries.forEach { effectEntry ->
-                if (effectEntry.language.equals(Language.en)) {
+                if (effectEntry.language.name == Language.en) {
                     longEffect = effectEntry.effect
                     shortEffect = effectEntry.short_effect
                 }
@@ -31,6 +32,7 @@ class Move(
             return Move(
                 id = data.id,
                 name = data.name,
+                priority = data.priority,
                 accuracy = data.accuracy,
                 power = data.power,
                 pp = data.pp,
@@ -45,6 +47,7 @@ class Move(
         return MoveData(
             id = this.id,
             name = this.name,
+            priority = this.priority,
             accuracy = this.accuracy,
             power = this.power,
             pp = this.pp,
@@ -60,6 +63,7 @@ class Move(
 data class MoveData(
     val id: Int,
     val name: String,
+    val priority: Int,
     val accuracy: Int?,
     val power: Int?,
     val pp: Int,

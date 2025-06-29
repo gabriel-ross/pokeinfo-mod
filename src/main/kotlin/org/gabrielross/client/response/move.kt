@@ -8,6 +8,7 @@ import org.gabrielross.constants.VersionGroup
 data class MoveResponse(
     val id: Int,
     val name: String,
+    val priority: Int,
     val accuracy: Int?,
     val power: Int?,
     val pp: Int,

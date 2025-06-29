@@ -9,8 +9,10 @@ class PokeinfoTest {
     fun testGetMove() {
         val baseHTTPClient = OkHttpClient()
         val baseUrl = "https://pokeapi.co/api/v2"
+        val cl = Client(baseUrl, baseHTTPClient)
         val pokeinfo = Pokeinfo(Client(baseUrl, baseHTTPClient))
-        println(pokeinfo.getMove("bullet-punch").Data().toString())
-        assertEquals(1,2)
+        println(pokeinfo.getMove("headbutt").Data().toString())
+//        println(pokeinfo.getMove("bullet-punch").Data().toString())
+//        assertEquals(1,2)
     }
 }

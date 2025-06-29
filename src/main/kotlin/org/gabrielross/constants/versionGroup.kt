@@ -59,7 +59,7 @@ enum class VersionGroup() {
     @SerialName("ultra-sun-ultra-moon")
     usum,
 
-    @SerialName("lets-go-pikachu-eevee")
+    @SerialName("lets-go-pikachu-lets-go-eevee")
     lgpe,
 
     @SerialName("legends-arceus")
