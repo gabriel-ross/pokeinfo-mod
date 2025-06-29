@@ -45,9 +45,7 @@ data class PokemonData(
     val evYield: Stats = Stats(),
     val type1: Type,
     val type2: Type?,
-    val eggGroup1: EggGroup,
-    val eggGroup2: EggGroup?,
-    val growthRate: GrowthRate
+    val speciesData: SpeciesData?
 )
 
 class Pokemon(
@@ -59,9 +57,7 @@ class Pokemon(
     val evYield: Stats = Stats(),
     val type1: Type,
     val type2: Type?,
-    val eggGroup1: EggGroup,
-    val eggGroup2: EggGroup?,
-    val growthRate: GrowthRate
+    val speciesData: SpeciesData?
 ) {
     companion object {
         // Creates a Pokemon object from a PokemonResponse object containing data
@@ -128,10 +124,8 @@ class Pokemon(
                 moves = emptyList<PokemonMove>(),
                 type1 = type1,
                 type2 = type2,
-                // todo: fix these later
-                eggGroup1 = EggGroup.noEggsDiscovered,
-                eggGroup2 = null,
-                growthRate = GrowthRate.erratic
+                // todo: fix this later
+                speciesData = null
             )
         }
     }
@@ -155,9 +149,7 @@ class Pokemon(
             evYield = this.evYield,
             type1 = this.type1,
             type2 = this.type2,
-            eggGroup1 = this.eggGroup1,
-            eggGroup2 = this.eggGroup2,
-            growthRate = this.growthRate,
+            speciesData = null
         )
     }
 }

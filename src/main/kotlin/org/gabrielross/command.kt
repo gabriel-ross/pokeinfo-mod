@@ -13,10 +13,12 @@ import org.gabrielross.api.Pokeinfo
 class PokemonCommand {
     companion object {
         fun register(dispatcher: CommandDispatcher<CommandSourceStack>, api: Pokeinfo) {
-            // Register base pokemon command
+            // Defines base pokemon command
             val baseCmd = Commands.literal("pokemon").then(Commands.argument("identifier", greedyString()).executes { ctx ->
-                                getPokemon(ctx.source, getString(ctx, "identifier"), api)
-                            })
+                getPokemon(ctx.source, getString(ctx, "identifier"), api)
+            })
+
+            // Defines subcommands
             val evYieldCmd = Commands.literal("evyield").then(Commands.argument("identifier", greedyString()).executes { ctx ->
                 getPokemonEvYield(ctx.source, getString(ctx, "identifier"), api)
             })
