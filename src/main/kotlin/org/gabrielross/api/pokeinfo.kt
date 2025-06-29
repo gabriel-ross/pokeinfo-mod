@@ -34,19 +34,21 @@ class Pokeinfo(
 
     // Get the names of pokemon that learn a move
     fun getMoveLearnset(name: String): List<String> {
-        val resp = this.apiClient.getMove(name)
-        var learnset = mutableListOf<String>()
-        resp.learned_by_pokemon.forEach { pokemon ->
-            // Remove Megas from learnset as they have the same learnset
-            // as their base pokemon
-            if (pokemon.name.contains("-mega")) return@forEach
-            learnset.add(pokemon.name)
-        }
-        return learnset
+        return getMoveLearnset(name.split("[],"))
+
+//        val resp = this.apiClient.getMove(name)
+//        var learnset = mutableListOf<String>()
+//        resp.learned_by_pokemon.forEach { pokemon ->
+//            // Remove Megas from learnset as they have the same learnset
+//            // as their base pokemon
+//            if (pokemon.name.contains("-mega")) return@forEach
+//            learnset.add(pokemon.name)
+//        }
+//        return learnset
     }
 
     // Get the names of pokemon that learn all moves in names
-    fun getMoveLearnsetIntersect(names: List<String>): List<String> {
+    fun getMoveLearnset(names: List<String>): List<String> {
         if (names.isEmpty()) {
             return emptyList()
         } else if (names.size == 1) {

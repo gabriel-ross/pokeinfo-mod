@@ -7,6 +7,7 @@ import com.mojang.brigadier.arguments.StringArgumentType.greedyString
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
 import net.minecraft.network.chat.Component
+import org.gabrielross.PokemonCommand.Companion.getAbilities
 import org.gabrielross.PokemonCommand.Companion.getEvYield
 import org.gabrielross.PokemonCommand.Companion.getPokemon
 import org.gabrielross.api.Pokeinfo
@@ -61,8 +62,12 @@ class MoveCommand {
             val effect = Commands.literal("effect").then(Commands.argument("identifier", greedyString()).executes { ctx ->
                 getMoveEffect(ctx.source, getString(ctx, "identifier"), api)
             })
+            val learnset = Commands.literal("learnset").then(Commands.argument("identifier", greedyString()).executes { ctx ->
+                getLearnset(ctx.source, getString(ctx, "identifier"), api)
+            })
 
             baseCmd.then(effect)
+            baseCmd.then(learnset)
             dispatcher.register(baseCmd)
         }
 
@@ -71,9 +76,13 @@ class MoveCommand {
             return 1
         }
 
-
         fun getMoveEffect(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
             source.sendSystemMessage(Component.literal(api.getMove(identifier).Data().shortEffect.toString()))
+            return 1
+        }
+
+        fun getLearnset(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
+            source.sendSystemMessage(Component.literal(api.getMoveLearnset(identifier).toString()))
             return 1
         }
     }
