@@ -48,6 +48,16 @@ data class PokemonData(
     val speciesData: SpeciesData?
 )
 
+data class PokemonAbilityData(
+    val name: String,
+    val isHidden: Boolean
+)
+
+data class PokemonMoveData(
+    val name: String,
+    val learnMethod: MoveLearnMethod
+)
+
 class Pokemon(
     val id: Int,
     val name: String,
@@ -154,11 +164,6 @@ class Pokemon(
     }
 }
 
-data class PokemonAbilityData(
-    val name: String,
-    val isHidden: Boolean
-)
-
 class PokemonAbility(
     val name: String,
     val isHidden: Boolean
@@ -170,11 +175,6 @@ class PokemonAbility(
         )
     }
 }
-
-data class PokemonMoveData(
-    val name: String,
-    val learnMethod: MoveLearnMethod
-)
 
 class PokemonMove(
     val name: String,

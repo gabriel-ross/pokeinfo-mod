@@ -6,6 +6,23 @@ import org.gabrielross.constants.Language
 import org.gabrielross.constants.Type
 import kotlin.Int
 
+// Contains data for a move object
+data class MoveData(
+    val id: Int,
+    val name: String,
+    val priority: Int,
+    val accuracy: Int?,
+    val power: Int?,
+    val pp: Int,
+    val type: Type,
+    val damageClass: DamageClass,
+    val shortEffect: String,
+    val longEffect: String
+) {
+    override fun toString(): String {
+        return "id: ${this.id}\nname: ${this.name}\npriority: ${this.priority}\naccuracy: ${this.accuracy}\npower: ${this.power}\npp: ${this.pp}\ndamageClass: ${this.damageClass}\ntype: ${this.type}\neffect: ${this.shortEffect}\n"
+    }
+}
 
 class Move(
     val id: Int,
@@ -58,17 +75,3 @@ class Move(
         )
     }
 }
-
-// Contains data for a move object
-data class MoveData(
-    val id: Int,
-    val name: String,
-    val priority: Int,
-    val accuracy: Int?,
-    val power: Int?,
-    val pp: Int,
-    val type: Type,
-    val damageClass: DamageClass,
-    val longEffect: String,
-    val shortEffect: String
-)

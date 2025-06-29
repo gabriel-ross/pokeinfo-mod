@@ -7,6 +7,8 @@ import com.mojang.brigadier.arguments.StringArgumentType.greedyString
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
 import net.minecraft.network.chat.Component
+import org.gabrielross.PokemonCommand.Companion.getEvYield
+import org.gabrielross.PokemonCommand.Companion.getPokemon
 import org.gabrielross.api.Pokeinfo
 
 
@@ -16,14 +18,18 @@ class PokemonCommand {
             // Defines base pokemon command
             val baseCmd = Commands.literal("pokemon").then(Commands.argument("identifier", greedyString()).executes { ctx ->
                 getPokemon(ctx.source, getString(ctx, "identifier"), api)
-            })
+            }).executes { ctx -> Common.noArguments(ctx.source, "/pokemon") }
 
             // Defines subcommands
-            val evYieldCmd = Commands.literal("evyield").then(Commands.argument("identifier", greedyString()).executes { ctx ->
-                getPokemonEvYield(ctx.source, getString(ctx, "identifier"), api)
+            val abilities = Commands.literal("abilities").then(Commands.argument("identifier", greedyString()).executes { ctx ->
+                getAbilities(ctx.source, getString(ctx, "identifier"), api)
+            })
+            val evYield = Commands.literal("evyield").then(Commands.argument("identifier", greedyString()).executes { ctx ->
+                getEvYield(ctx.source, getString(ctx, "identifier"), api)
             })
 
-            baseCmd.then(evYieldCmd)
+            baseCmd.then(abilities)
+            baseCmd.then(evYield)
             dispatcher.register(baseCmd)
         }
 
@@ -32,12 +38,56 @@ class PokemonCommand {
             return 1
         }
 
-        fun getPokemonEvYield(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
+        fun getAbilities(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
+            source.sendSystemMessage(Component.literal(api.getPokemon(identifier).Data().toString()))
+            return 1
+        }
+
+        fun getEvYield(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
             source.sendSystemMessage(Component.literal(api.getPokemon(identifier).Data().evYield.toString()))
             return 1
         }
     }
 }
+
+
+class MoveCommand {
+    companion object {
+        fun register(dispatcher: CommandDispatcher<CommandSourceStack>, api: Pokeinfo) {
+            val baseCmd = Commands.literal("moves").then(Commands.argument("identifier", greedyString()).executes { ctx ->
+                getMoveInfo(ctx.source, getString(ctx, "identifier"), api)
+            }).executes { ctx -> Common.noArguments(ctx.source, "/move") }
+
+            val effect = Commands.literal("effect").then(Commands.argument("identifier", greedyString()).executes { ctx ->
+                getMoveEffect(ctx.source, getString(ctx, "identifier"), api)
+            })
+
+            baseCmd.then(effect)
+            dispatcher.register(baseCmd)
+        }
+
+        fun getMoveInfo(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
+            source.sendSystemMessage(Component.literal(api.getMove(identifier).Data().toString()))
+            return 1
+        }
+
+
+        fun getMoveEffect(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
+            source.sendSystemMessage(Component.literal(api.getMove(identifier).Data().shortEffect.toString()))
+            return 1
+        }
+    }
+}
+
+class Common {
+    companion object {
+        fun noArguments(source: CommandSourceStack, cmdName: String): Int {
+            source.sendSystemMessage(Component.literal("$cmdName called with no arguments"))
+            return 1
+        }
+    }
+}
+
 //
 //
 //class PokemonCommand {
@@ -72,36 +122,6 @@ class PokemonCommand {
 //    }
 //}
 
-class MoveCommand {
-    companion object {
-        fun register(dispatcher: CommandDispatcher<CommandSourceStack>, pokeinfo: Pokeinfo) {
-            dispatcher.register(
-                Commands.literal("move")
-                    .then(
-                        Commands.argument("identifier", greedyString())
-                            .executes { ctx ->
-                                getMoveInfo(ctx.source, getString(ctx, "identifier"), pokeinfo)
-                            }
-                    )
-                    .executes { ctx ->
-                        ctx.source.sendSystemMessage(Component.literal("move called with no arguments"))
-                        1
-                    }
-//                    .then(
-//                        Commands.argument("field", greedyString())
-//                            .executes { ctx ->
-//                                getMoveInfo(ctx.source, getString(ctx, "field"), pokeinfo)
-//                            }
-//                    )
-            )
-        }
-
-        fun getMoveInfo(source: CommandSourceStack, identifier: String, pokeinfo: Pokeinfo): Int {
-            source.sendSystemMessage(Component.literal(pokeinfo.getMove(identifier).Data().toString()))
-            return 1
-        }
-    }
-}
 
 class BrigExampleCommand {
     companion object {
