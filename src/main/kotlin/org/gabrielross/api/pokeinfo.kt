@@ -5,6 +5,7 @@ import org.gabrielross.client.response.SpeciesResponse
 import org.gabrielross.model.Move
 import org.gabrielross.model.Pokemon
 import org.gabrielross.model.SpeciesData
+import kotlin.text.replace
 
 class Pokeinfo(
     val apiClient: Client
@@ -34,17 +35,7 @@ class Pokeinfo(
 
     // Get the names of pokemon that learn a move
     fun getMoveLearnset(names: String): List<String> {
-        return getMoveLearnset(cleanInput(names).split(","))
-
-//        val resp = this.apiClient.getMove(name)
-//        var learnset = mutableListOf<String>()
-//        resp.learned_by_pokemon.forEach { pokemon ->
-//            // Remove Megas from learnset as they have the same learnset
-//            // as their base pokemon
-//            if (pokemon.name.contains("-mega")) return@forEach
-//            learnset.add(pokemon.name)
-//        }
-//        return learnset
+        return getMoveLearnset(cleanPotentialListInput(names).split(","))
     }
 
     // Get the names of pokemon that learn all moves in names
@@ -52,23 +43,22 @@ class Pokeinfo(
         if (names.isEmpty()) {
             return emptyList()
         } else if (names.size == 1) {
-            return this.getMoveLearnset(names[0])
+            return this.getMoveLearnset(cleanNameInput(names[0]))
         }
 
-        var resp = this.apiClient.getMove(names[0])
+        var resp = this.apiClient.getMove(cleanNameInput(names[0]))
         var learnsetIntersects = mutableSetOf<String>()
 
         // Initialize learnset
         resp.learned_by_pokemon.forEach { pokemon ->
-            // Remove Megas from learnset as they have the same learnset
-            // as their base pokemon
-            if (pokemon.name.contains("-mega")) return@forEach
+            // Filter megas & gmax pokemon as they have the same learnset as base
+            if (pokemon.name.contains("-mega") || pokemon.name.contains("-gmax")) return@forEach
             learnsetIntersects.add(pokemon.name)
         }
 
         names.drop(1).forEach { moveName ->
             var learnset = mutableSetOf<String>()
-            resp = this.apiClient.getMove(moveName)
+            resp = this.apiClient.getMove(cleanNameInput(moveName))
             resp.learned_by_pokemon.forEach { pokemon ->
                 if (learnsetIntersects.contains(pokemon.name)) {
                     learnset.add(pokemon.name)
@@ -86,20 +76,20 @@ class Pokeinfo(
         names.forEach { name ->
             val resp = this.apiClient.getMove(name)
             resp.learned_by_pokemon.forEach { pokemon ->
-                if (
-                    pokemon.name.contains("-mega") ||
-                    pokemon.name.contains("-gmax")
-                ) return@forEach
+                // Filter megas & gmax pokemon as they have the same learnset as base
+                if (pokemon.name.contains("-mega") || pokemon.name.contains("-gmax")) return@forEach
 
                 learnset.add(pokemon.name)
             }
         }
         return learnset.toList()
     }
-    private fun cleanInput(inp: String): String {
+
+    private fun cleanPotentialListInput(inp: String): String {
         return inp.filterNot{c -> c == '[' || c == ']'}
-            .replace("_", "-")
-            .replace(" ", "-")
+    }
+    private fun cleanNameInput(inp: String): String {
+        return inp.trim().replace("_", "-").replace(" ", "-")
     }
 
 // todo
