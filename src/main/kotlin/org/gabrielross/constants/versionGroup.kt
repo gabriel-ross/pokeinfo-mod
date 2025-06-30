@@ -72,7 +72,13 @@ enum class VersionGroup() {
     swsh,
 
     @SerialName("scarlet-violet")
-    scvi
+    scvi,
+
+    @SerialName("the-teal-mask")
+    tealmask,
+
+    @SerialName("the-indigo-disk")
+    indigodisk
 }
 
 //enum class VersionGroup(name: String) {

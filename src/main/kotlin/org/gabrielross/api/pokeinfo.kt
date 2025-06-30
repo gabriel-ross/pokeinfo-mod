@@ -33,8 +33,8 @@ class Pokeinfo(
     }
 
     // Get the names of pokemon that learn a move
-    fun getMoveLearnset(name: String): List<String> {
-        return getMoveLearnset(name.split("[],"))
+    fun getMoveLearnset(names: String): List<String> {
+        return getMoveLearnset(cleanInput(names).split(","))
 
 //        val resp = this.apiClient.getMove(name)
 //        var learnset = mutableListOf<String>()
@@ -95,6 +95,11 @@ class Pokeinfo(
             }
         }
         return learnset.toList()
+    }
+    private fun cleanInput(inp: String): String {
+        return inp.filterNot{c -> c == '[' || c == ']'}
+            .replace("_", "-")
+            .replace(" ", "-")
     }
 
 // todo

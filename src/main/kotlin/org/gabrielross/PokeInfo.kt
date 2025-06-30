@@ -28,10 +28,10 @@ object PokeInfo : ModInitializer {
         CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
             PokemonCommand.register(dispatcher, pokeinfo)
         }
-//
-//        CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
-//            MoveCommand.register(dispatcher, pokeinfo)
-//        }
+
+        CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
+            MoveCommand.register(dispatcher, pokeinfo)
+        }
 //
 //        CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
 //            BrigExampleCommand.register(dispatcher)
