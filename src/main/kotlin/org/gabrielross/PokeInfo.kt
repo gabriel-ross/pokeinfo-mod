@@ -8,9 +8,6 @@ import org.gabrielross.api.Pokeinfo
 import org.gabrielross.client.Client
 import org.slf4j.LoggerFactory
 
-@Serializable
-data class pokemonresponse(val name: String, val id: Int)
-
 object PokeInfo : ModInitializer {
     private val logger = LoggerFactory.getLogger("pokeinfo")
 
@@ -32,13 +29,13 @@ object PokeInfo : ModInitializer {
         CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
             MoveCommand.register(dispatcher, pokeinfo)
         }
-//
-//        CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
-//            BrigExampleCommand.register(dispatcher)
-//        }
 
         CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
-            DemoCommand.register(dispatcher)
+            AbilityCommand.register(dispatcher, pokeinfo)
+        }
+
+        CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
+            HelpCommand.register(dispatcher)
         }
 
 

@@ -2,6 +2,7 @@ package org.gabrielross.api
 
 import org.gabrielross.client.Client
 import org.gabrielross.client.response.SpeciesResponse
+import org.gabrielross.model.Ability
 import org.gabrielross.model.Move
 import org.gabrielross.model.Pokemon
 import org.gabrielross.model.SpeciesData
@@ -23,8 +24,12 @@ class Pokeinfo(
         return Move.fromResponse(this.apiClient.getMove(identifier))
     }
 
+    fun getAbility(identifier: String): Ability {
+        return Ability.FromResponse(this.apiClient.getAbility(identifier))
+    }
+
     fun getAbilityLearnset(name: String): List<String> {
-        val resp = this.apiClient.getAbility(name)
+        val resp = this.apiClient.getAbility(cleanNameInput(name))
         var learnset = mutableListOf<String>()
         resp.pokemon.forEach { pokemon ->
             if (pokemon.pokemon.name.contains("-gmax")) return@forEach

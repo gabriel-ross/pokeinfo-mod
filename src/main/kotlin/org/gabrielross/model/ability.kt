@@ -4,6 +4,13 @@ import org.gabrielross.client.response.AbilityResponse
 import org.gabrielross.constants.Language
 
 
+data class AbilityData(
+    val id: Int,
+    val name: String,
+    val shortEffect: String,
+    val longEffect: String
+)
+
 class Ability(
     val id: Int,
     val name: String,
@@ -15,7 +22,7 @@ class Ability(
             var longEffect = ""
             var shortEffect = ""
             data.effect_entries.forEach { effectEntry ->
-                if (effectEntry.language.equals(Language.en)) {
+                if (effectEntry.language.name == Language.en) {
                     longEffect = effectEntry.effect
                     shortEffect = effectEntry.short_effect
                 }
@@ -38,10 +45,3 @@ class Ability(
         )
     }
 }
-
-data class AbilityData(
-    val id: Int,
-    val name: String,
-    val shortEffect: String,
-    val longEffect: String
-)

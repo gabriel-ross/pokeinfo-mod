@@ -7,6 +7,9 @@ import com.mojang.brigadier.arguments.StringArgumentType.greedyString
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
 import net.minecraft.network.chat.Component
+import org.gabrielross.MoveCommand.Companion.getLearnset
+import org.gabrielross.MoveCommand.Companion.getMoveEffect
+import org.gabrielross.MoveCommand.Companion.getMoveInfo
 import org.gabrielross.PokemonCommand.Companion.getAbilities
 import org.gabrielross.PokemonCommand.Companion.getEvYield
 import org.gabrielross.PokemonCommand.Companion.getPokemon
@@ -46,6 +49,42 @@ class PokemonCommand {
 
         fun getEvYield(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
             source.sendSystemMessage(Component.literal(api.getPokemon(identifier).Data().evYield.toString()))
+            return 1
+        }
+    }
+}
+
+class AbilityCommand {
+    companion object {
+        fun register(dispatcher: CommandDispatcher<CommandSourceStack>, api: Pokeinfo) {
+            val baseCmd = Commands.literal("ability").then(Commands.argument("identifier", greedyString()).executes { ctx ->
+                abilityInfo(ctx.source, getString(ctx, "identifier"), api)
+            }).executes { ctx -> Common.noArguments(ctx.source, "/ability") }
+
+            val effect = Commands.literal("effect").then(Commands.argument("identifier", greedyString()).executes { ctx ->
+                abilityEffect(ctx.source, getString(ctx, "identifier"), api)
+            })
+            val learnset = Commands.literal("learnset").then(Commands.argument("identifier", greedyString()).executes { ctx ->
+                abilityLearnset(ctx.source, getString(ctx, "identifier"), api)
+            })
+
+            baseCmd.then(effect)
+            baseCmd.then(learnset)
+            dispatcher.register(baseCmd)
+        }
+
+        fun abilityInfo(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
+            source.sendSystemMessage(Component.literal(api.getAbility(identifier).Data().toString()))
+            return 1
+        }
+
+        fun abilityEffect(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
+            source.sendSystemMessage(Component.literal(api.getAbility(identifier).Data().shortEffect.toString()))
+            return 1
+        }
+
+        fun abilityLearnset(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
+            source.sendSystemMessage(Component.literal(api.getAbilityLearnset(identifier).toString()))
             return 1
         }
     }
@@ -154,25 +193,14 @@ class BrigExampleCommand {
     }
 }
 
-class DemoCommand {
+class HelpCommand {
     companion object {
         fun register(dispatcher: CommandDispatcher<CommandSourceStack>) {
             // todo: try doing root scizort
-            val rootCmd = Commands.literal("root").then(Commands.argument("arg1", greedyString()).then(Commands.argument("arg2", greedyString()))).executes { ctx ->
-                println("arg1: ${(getString(ctx, "arg1"))}")
-                println("arg2: ${(getString(ctx, "arg2"))}")
+            val rootCmd = Commands.literal("help").executes { ctx ->
+                ctx.source.sendSystemMessage(Component.literal("help command received"))
                 1
             }
-//            val rootCmd = Commands.literal("root").then(Commands.argument("arg1", greedyString())).then(Commands.argument("arg2", greedyString())).executes { ctx ->
-//                println("arg1: ${(getString(ctx, "arg1"))}")
-//                println("arg2: ${(getString(ctx, "arg2"))}")
-//                1
-//            }
-            val subcmd = Commands.literal("subcmd").then(Commands.argument("arg1", greedyString())).executes {
-                println("hello from subcmd")
-                1
-            }
-            rootCmd.then(subcmd)
             dispatcher.register(rootCmd)
         }
     }
