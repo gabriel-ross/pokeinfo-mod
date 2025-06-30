@@ -133,11 +133,12 @@ class Common {
 class HelpCommand {
     companion object {
         fun register(dispatcher: CommandDispatcher<CommandSourceStack>) {
-            // todo: try doing root scizort
-            val rootCmd = Commands.literal("help").executes { ctx ->
-                ctx.source.sendSystemMessage(Component.literal("help command received"))
+            val rootCmd = Commands.literal("foo").then(Commands.argument("arg1", StringArgumentType.string()).then(Commands.argument("arg2",
+                StringArgumentType.string()).executes { ctx ->
+                ctx.source.sendSystemMessage(Component.literal("arg1: ${getString(ctx, "arg1")}, arg2: ${getString(ctx, "arg2")}"))
+//                ctx.source.sendSystemMessage(Component.literal("help command received"))
                 1
-            }
+            }))
             dispatcher.register(rootCmd)
         }
     }
