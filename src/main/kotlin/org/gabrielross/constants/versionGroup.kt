@@ -6,79 +6,79 @@ import kotlinx.serialization.Serializable
 @Serializable
 enum class VersionGroup() {
     @SerialName("red-blue")
-    redblue,
+    RED_BLUE,
 
     @SerialName("yellow")
-    yellow,
+    YELLOW,
 
     @SerialName("gold-silver")
-    goldsilver,
+    GOLD_SILVER,
 
     @SerialName("crystal")
-    crystal,
+    CRYSTAL,
 
     @SerialName("ruby-sapphire")
-    rubysapphire,
+    RUBY_SAPPHIRE,
 
     @SerialName("emerald")
-    emerald,
+    EMERALD,
 
     @SerialName("firered-leafgreen")
-    frlg,
+    FIRE_RED_LEAF_GREEN,
 
     @SerialName("diamond-pearl")
-    diamondpearl,
+    DIAMOND_PEARL,
 
     @SerialName("platinum")
-    platinum,
+    PLATINUM,
 
     @SerialName("heartgold-soulsilver")
-    hgss,
+    HEART_GOLD_SOUL_SILVER,
 
     @SerialName("black-white")
-    bw,
+    BLACK_WHITE,
 
     @SerialName("colosseum")
-    colosseum,
+    COLOSSEUM,
 
     @SerialName("xd")
-    xd,
+    XD,
 
     @SerialName("black-2-white-2")
-    b2w2,
+    BLACK_2_WHITE_2,
 
     @SerialName("x-y")
-    xy,
+    X_Y,
 
     @SerialName("omega-ruby-alpha-sapphire")
-    oras,
+    OMEGA_RUBY_ALPHA_SAPPHIRE,
 
     @SerialName("sun-moon")
-    sm,
+    SUN_MOON,
 
     @SerialName("ultra-sun-ultra-moon")
-    usum,
+    ULTRA_SUN_ULTRA_MOON,
 
     @SerialName("lets-go-pikachu-lets-go-eevee")
-    lgpe,
+    LETS_GO_PIKACHU_LETS_GO_EEVEE,
 
     @SerialName("legends-arceus")
-    la,
+    LEGENDS_ARCEUS,
 
     @SerialName("brilliant-diamond-and-shining-pearl")
-    bdsp,
+    BRILLIANT_DIAMOND_AND_SHINING_PEARL,
 
     @SerialName("sword-shield")
-    swsh,
+    SWORD_SHIELD,
 
     @SerialName("scarlet-violet")
-    scvi,
+    SCARLET_VIOLET,
 
     @SerialName("the-teal-mask")
-    tealmask,
+    THE_TEAL_MASK,
 
     @SerialName("the-indigo-disk")
-    indigodisk
+    THE_INDIGO_DISK
 }
 
 //enum class VersionGroup(name: String) {
