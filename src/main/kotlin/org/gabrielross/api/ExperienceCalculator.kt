@@ -10,6 +10,8 @@ var M_CANDY_VALUE = 3000
 var S_CANDY_VALUE = 800
 var XS_CANDY_VALUE = 100
 
+data class CandyCalculatorResponse(val inventory: CandyInventory, val surplus: Int)
+
 data class CandyInventory(
     var XL: Int = 0,
     var L: Int = 0,
@@ -30,64 +32,67 @@ data class CandyInventory(
     }
 }
 
-class ExperienceCalculator(val client: Client) {
+class ExperienceCalculator() {
+    companion object {
+        fun calculateCandies(
+            xpNeeded: Int,
+            inventory: CandyInventory = CandyInventory.max()
+        ): CandyCalculatorResponse {
+            var xpNeeded = xpNeeded
+            var cost = CandyInventory(0,0,0,0,0)
 
-    fun calculateCandies(
-        inventory: CandyInventory = CandyInventory.max(),
-        startingLevel: Int,
-        targetLevel: Int,
-        pokemonIdentifier: String
-    ): CandyInventory {
-        val data = this.client.getPokemonSpecies(pokemonIdentifier)
-        return this.calculateCandies(inventory, startingLevel, targetLevel, data.growth_rate.name)
+            cost.XL = min(inventory.XL, xpNeeded.floorDiv(XL_CANDY_VALUE))
+            xpNeeded -= cost.XL * XL_CANDY_VALUE
+            inventory.XL -= cost.XL
+
+            cost.L = min(inventory.L, xpNeeded.floorDiv(L_CANDY_VALUE))
+            xpNeeded -= cost.L * L_CANDY_VALUE
+            inventory.L -= cost.L
+
+            cost.M = min(inventory.M, xpNeeded.floorDiv(M_CANDY_VALUE))
+            xpNeeded -= cost.M * M_CANDY_VALUE
+            inventory.M -= cost.M
+
+            cost.S = min(inventory.S, xpNeeded.floorDiv(S_CANDY_VALUE))
+            xpNeeded -= cost.S * S_CANDY_VALUE
+            inventory.S -= cost.S
+
+            cost.XS = min(inventory.XS, xpNeeded.floorDiv(XS_CANDY_VALUE))
+            xpNeeded -= cost.XS * XS_CANDY_VALUE
+            inventory.XS -= cost.XS
+
+            while (xpNeeded > 0) {
+                when {
+                    inventory.XS > 0 -> {
+                        xpNeeded -= XS_CANDY_VALUE
+                        cost.XS += 1
+                        inventory.XS -= 1
+                    }
+                    inventory.S > 0 -> {
+                        xpNeeded -= S_CANDY_VALUE
+                        cost.S += 1
+                        inventory.S -= 1
+                    }
+                    inventory.M > 0 -> {
+                        xpNeeded -= M_CANDY_VALUE
+                        cost.M += 1
+                        inventory.M -= 1
+                    }
+                    inventory.L > 0 -> {
+                        xpNeeded -= L_CANDY_VALUE
+                        cost.L += 1
+                        inventory.L -= 1
+                    }
+                    inventory.XL > 0 -> {
+                        xpNeeded -= XL_CANDY_VALUE
+                        cost.XL += 1
+                        inventory.XL -= 1
+                    }
+                }
+            }
+
+            return CandyCalculatorResponse(cost, -1 * xpNeeded)
+        }
     }
 
-    fun calculateCandies(
-        inventory: CandyInventory = CandyInventory.max(),
-        startingLevel: Int,
-        targetLevel: Int,
-        growthRate: GrowthRate
-    ): CandyInventory {
-        val data = this.client.getGrowthRate(growthRate.toString())
-        var start = data.levels[startingLevel-1]
-        var target = data.levels[targetLevel-1]
-
-        // Search for level data if levels list is not ordered.
-        if (start.level != startingLevel) {
-            start = data.levels.find { levelEntry -> levelEntry.level == startingLevel }!!
-        }
-        if (target.level != targetLevel) {
-            target = data.levels.find { levelEntry -> levelEntry.level == targetLevel }!!
-        }
-
-        var cost = CandyInventory(0,0,0,0,0)
-        var xpNeeded = target.experience - start.experience
-
-        cost.XL = min(inventory.XL, xpNeeded.floorDiv(XL_CANDY_VALUE))
-        xpNeeded -= cost.XL * XL_CANDY_VALUE
-        inventory.XL -= cost.XL
-
-        cost.L = min(inventory.L, xpNeeded.floorDiv(L_CANDY_VALUE))
-        xpNeeded -= cost.L * L_CANDY_VALUE
-        inventory.L -= cost.L
-
-        cost.M = min(inventory.M, xpNeeded.floorDiv(M_CANDY_VALUE))
-        xpNeeded -= cost.M * M_CANDY_VALUE
-        inventory.M -= cost.M
-
-        cost.S = min(inventory.S, xpNeeded.floorDiv(S_CANDY_VALUE))
-        xpNeeded -= cost.S * S_CANDY_VALUE
-        inventory.S -= cost.S
-
-        cost.S = min(inventory.S, xpNeeded.floorDiv(S_CANDY_VALUE))
-        xpNeeded -= cost.S * S_CANDY_VALUE
-        inventory.S -= cost.S
-
-        if (xpNeeded > 0) {
-
-        }
-
-
-        return cost
-    }
 }
