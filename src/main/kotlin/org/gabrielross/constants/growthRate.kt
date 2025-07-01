@@ -9,22 +9,37 @@ fun FromString(name: String): GrowthRate {
 }
 
 @Serializable
-enum class GrowthRate(name: String) {
+enum class GrowthRate() {
+
     @SerialName("slow")
-    Slow("slow"),
+    Slow,
 
     @SerialName("medium")
-    Medium("medium"),
+    Medium,
 
     @SerialName("fast")
-    Fast("fast"),
+    Fast,
 
     @SerialName("medium-slow")
-    MediumSlow("medium-slow"),
+    MediumSlow,
 
     @SerialName("slow-then-very-fast")
-    Fluctuating("slow-then-very-fast"),
+    Fluctuating,
 
     @SerialName("fast-then-very-slow")
-    Erratic("fast-then-very-slow")
+    Erratic;
+
+    companion object {
+        fun valueOf(g: GrowthRate): String {
+            when (g) {
+                Slow -> "slow"
+                Medium -> "medium"
+                Fast -> "fast"
+                MediumSlow -> "medium-slow"
+                Fluctuating -> "slow-then-very-fast"
+                Erratic -> "fast-then-very-slow"
+            }
+            return ""
+        }
+    }
 }

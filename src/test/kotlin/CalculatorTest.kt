@@ -10,6 +10,7 @@ class CalculatorTest {
 
     @Test fun demo() {
         val a = GrowthRate.MediumSlow.name
+        println()
         println(a)
         println(150.floorDiv(100))
     }
@@ -38,8 +39,13 @@ class CalculatorTest {
     }
 
     @Test
-    fun notEnoughSmallerCandies() {
-
+    fun optimalCandyAllocation() {
+        val resp = ExperienceCalculator.calculateCandies(30200, CandyInventory(2, 0, 0, 0, 1))
+        assertEquals(2, resp.inventory.XL)
+        assertEquals(0, resp.inventory.L)
+        assertEquals(0, resp.inventory.M)
+        assertEquals(0, resp.inventory.S)
+        assertEquals(0, resp.inventory.XS)
+        assertEquals(60000-30200, resp.surplus)
     }
-
 }

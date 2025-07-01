@@ -2,6 +2,7 @@ package org.gabrielross.api
 
 import org.gabrielross.client.Client
 import org.gabrielross.client.response.SpeciesResponse
+import org.gabrielross.constants.GrowthRate
 import org.gabrielross.model.Ability
 import org.gabrielross.model.Move
 import org.gabrielross.model.Pokemon
@@ -15,7 +16,7 @@ class Pokeinfo(
     fun calculateCandies(pokemonIdentifier: String, startLevel: Int, targetLevel: Int, candyInventory: CandyInventory = CandyInventory.max()): CandyCalculatorResponse {
         // Fetch pokemon growthrate from pokemon-species endpoint, then
         // fetch growth rate level data from growth-rate endpoint.
-        val growthRateData = this.apiClient.getGrowthRate(this.apiClient.getPokemonSpecies(pokemonIdentifier).growth_rate.name.toString())
+        val growthRateData = this.apiClient.getGrowthRate(GrowthRate.valueOf(this.apiClient.getPokemonSpecies(pokemonIdentifier).growth_rate.name))
         var start = growthRateData.levels[startLevel-1]
         var target = growthRateData.levels[targetLevel-1]
 
