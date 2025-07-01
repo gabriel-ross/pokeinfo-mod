@@ -66,8 +66,6 @@ class Pokeinfo(
     fun getMoveLearnset(names: List<String>): List<String> {
         if (names.isEmpty()) {
             return emptyList()
-        } else if (names.size == 1) {
-            return this.getMoveLearnset(cleanNameInput(names[0]))
         }
 
         var resp = this.apiClient.getMove(cleanNameInput(names[0]))
@@ -78,6 +76,10 @@ class Pokeinfo(
             // Filter megas & gmax pokemon as they have the same learnset as base
             if (pokemon.name.contains("-mega") || pokemon.name.contains("-gmax")) return@forEach
             learnsetIntersects.add(pokemon.name)
+        }
+
+        if (names.size == 1) {
+            return learnsetIntersects.toList()
         }
 
         names.drop(1).forEach { moveName ->
