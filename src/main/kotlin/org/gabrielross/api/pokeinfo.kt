@@ -3,6 +3,7 @@ package org.gabrielross.api
 import org.gabrielross.client.Client
 import org.gabrielross.client.response.SpeciesResponse
 import org.gabrielross.constants.GrowthRate
+import org.gabrielross.constants.MoveLearnMethod
 import org.gabrielross.model.Ability
 import org.gabrielross.model.Move
 import org.gabrielross.model.Pokemon
@@ -96,6 +97,40 @@ class Pokeinfo(
         return learnsetIntersects.toList()
     }
 
+    fun pokemonLearnsMove(
+        pokemonIdentifier: String,
+        moveIdentifier: String,
+        includeMachines: Boolean = false,
+        includeEggMoves: Boolean = false
+        ): LearnableMove {
+
+        if (!includeMachines) {
+            val pkData = this.apiClient.getPokemon(pokemonIdentifier)
+            val moveEntry = pkData.moves.find { move ->
+                move.move.name == moveIdentifier
+            }
+        } else {
+            val pkData = this.apiClient.getPokemon(pokemonIdentifier)
+            val moveEntry = pkData.moves.find { move ->
+                move.move.name == moveIdentifier
+            }
+        }
+
+
+        // If pokemon learns move by level up
+        if (moveEntry != null) {
+            return LearnableMove(
+                pokemonIdentifier,
+                moveIdentifier,
+                moveEntry.version_group_details[moveEntry.version_group_details.size-1].move_learn_method.name,
+                moveEntry.version_group_details[moveEntry.version_group_details.size-1].level_learned_at
+            )
+        }
+
+
+        return LearnableMove("scizor", "bullet-punch", MoveLearnMethod.levelup, 1)
+    }
+
     // Get the pokemon that learn any of the listed moves
     fun GetMoveLearnsetUnion(names: List<String>): List<String> {
         var learnset = mutableSetOf<String>()
@@ -128,3 +163,10 @@ class Pokeinfo(
 //
 //    }
 }
+
+data class LearnableMove(
+    val pokemon: String,
+    val move: String,
+    val learnMethod: MoveLearnMethod,
+    val levelLearnedAt: Int?
+)

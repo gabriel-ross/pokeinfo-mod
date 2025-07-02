@@ -6,22 +6,36 @@ import kotlinx.serialization.Serializable
 @Serializable
 enum class MoveLearnMethod() {
     @SerialName("level-up")
-    levelup,
+    LevelUp,
 
     @SerialName("machine")
-    machine,
+    Machine,
 
     @SerialName("egg")
-    egg,
+    Egg,
 
     @SerialName("tutor")
-    tutor,
+    Tutor,
 
     @SerialName("event")
-    event,
+    Event,
 
     @SerialName("prior-evolution")
-    priorevolution
+    PriorEvolution;
+
+    companion object {
+        fun ValueOf(m: MoveLearnMethod): String {
+            when (m) {
+                LevelUp -> "level-up"
+                Machine -> "machine"
+                Egg -> "egg"
+                Tutor -> "tutor"
+                Event -> "event"
+                PriorEvolution -> "prior-evolution"
+            }
+            return ""
+        }
+    }
 }
 
 //enum class MoveLearnMethod(name: String) {
