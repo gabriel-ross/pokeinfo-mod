@@ -3,6 +3,9 @@ import org.gabrielross.api.Pokeinfo
 import org.gabrielross.client.Client
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import kotlin.random.Random
+import kotlin.random.nextInt
+import kotlin.test.assertContains
 
 class PokeinfoTest {
     fun setup(): Pokeinfo {
@@ -43,5 +46,35 @@ class PokeinfoTest {
         assertEquals(true, learnsByEvolution.canLearnMove)
         assertEquals(0, learnsByEvolution.levelLearnedAt)
         assertEquals(true, learnsByEvolution.learnsByLevelUp)
+    }
+
+    @Test
+    fun testGetSharedEggGroups() {
+        val cl = Client("https://pokeapi.co/api/v2", OkHttpClient())
+        val api = Pokeinfo(cl)
+        var expectedPokemon = mutableSetOf<String>()
+        cl.getEggGroup("ground").pokemon_species.forEach { it ->
+            expectedPokemon.add(it.name)
+        }
+        cl.getEggGroup("water2").pokemon_species.forEach { it ->
+            expectedPokemon.add(it.name)
+        }
+
+        val resp = api.sharedEggGroup("finizen")
+        for (i in 1..10) {
+            val pk = expectedPokemon.random()
+            assertContains(resp, pk)
+        }
+    }
+
+    @Test
+    fun testTwoPokemonShareEggGroup() {
+        val api = setup()
+        // Test method returns false on NoEggsDiscovered
+        assertEquals(false, api.canBreed("riolu", "lucario"))
+        // Test method returns true for two pokemon that share an egg group
+        assertEquals(true, api.canBreed("lucario", "torchic"))
+        // Test method returns false for two pokemon that do not share an egg group
+        assertEquals(false, api.canBreed("scizor", "torchic"))
     }
 }

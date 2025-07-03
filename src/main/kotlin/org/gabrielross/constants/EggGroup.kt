@@ -50,7 +50,7 @@ enum class EggGroup() {
     @SerialName("no-eggs-discovered")
     NoEggsDiscovered,
 
-    // The following are names given to egg groups unique to the api
+    // The following are previous names of egg groups.
     // Corresponds to: Field
     @SerialName("ground")
     Ground,
@@ -63,12 +63,13 @@ enum class EggGroup() {
     @SerialName("humanshape")
     HumanShape,
 
+    // Corresponds to Amorphous
+    @SerialName("indeterminate")
+    Indeterminate,
+
     // Corresponds to: NoEggsDiscovered
     @SerialName("no-eggs")
-    NoEggs,
-
-    @SerialName("indeterminate")
-    Indeterminate;
+    NoEggs;
 
     override fun toString(): String = when(this) {
         Mineral -> "mineral"

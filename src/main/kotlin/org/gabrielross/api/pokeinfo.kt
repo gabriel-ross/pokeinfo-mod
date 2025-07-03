@@ -167,7 +167,7 @@ class Pokeinfo(
     }
 
     // Get all pokemon that share an egg group with a given pokemon.
-    fun sharedEggGroupPokemon(pokemonIdentifier: String): List<String> {
+    fun sharedEggGroup(pokemonIdentifier: String): List<String> {
         var pokemon = mutableSetOf<String>()
         val speciesResp = this.apiClient.getPokemonSpecies(pokemonIdentifier).egg_groups.forEach { it ->
             this.apiClient.getEggGroup(it.name.toString()).pokemon_species.forEach { pk ->
@@ -185,7 +185,7 @@ class Pokeinfo(
     //
     // Returns true if either of the pokemon are ditto or if they share any
     // egg groups.
-    fun pokemonShareEggGroup(pkIdentifier1: String, pkIdentifier2: String): Boolean {
+    fun canBreed(pkIdentifier1: String, pkIdentifier2: String): Boolean {
         val dittoName = "ditto"
         val dittoId = "132"
         if (pkIdentifier1 == dittoName ||
