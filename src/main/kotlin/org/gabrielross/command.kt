@@ -116,12 +116,16 @@ class MoveCommand {
             val effect = Commands.literal("effect").then(Commands.argument("identifier", greedyString()).executes { ctx ->
                 moveEffect(ctx.source, getString(ctx, "identifier"), api)
             })
-            val learnset = Commands.literal("learnset").then(Commands.argument("identifier", greedyString()).executes { ctx ->
-                learnset(ctx.source, getString(ctx, "identifier"), api)
+            val learnsetIntersect = Commands.literal("learnset").then(Commands.argument("identifier", greedyString()).executes { ctx ->
+                learnsetIntersect(ctx.source, getString(ctx, "identifier"), api)
+            })
+            val learnsetOr = Commands.literal("learnsetor").then(Commands.argument("identifier", greedyString()).executes { ctx ->
+                learnsetOr(ctx.source, getString(ctx, "identifier"), api)
             })
 
             baseCmd.then(effect)
-            baseCmd.then(learnset)
+            baseCmd.then(learnsetIntersect)
+            baseCmd.then(learnsetOr)
             dispatcher.register(baseCmd)
         }
 
@@ -135,8 +139,13 @@ class MoveCommand {
             return 1
         }
 
-        fun learnset(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
+        fun learnsetIntersect(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
             source.sendSystemMessage(Component.literal(api.getMoveLearnset(identifier).toString()))
+            return 1
+        }
+
+        fun learnsetOr(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
+            source.sendSystemMessage(Component.literal(api.getMoveLearnsetUnion(identifier).toString()))
             return 1
         }
     }

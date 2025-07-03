@@ -1,9 +1,7 @@
 package org.gabrielross.api
 
 import org.gabrielross.client.Client
-import org.gabrielross.client.response.SpeciesResponse
 import org.gabrielross.constants.EggGroup
-import org.gabrielross.constants.GrowthRate
 import org.gabrielross.constants.MoveLearnMethod
 import org.gabrielross.model.Ability
 import org.gabrielross.model.Move
@@ -152,7 +150,12 @@ class Pokeinfo(
     }
 
     // Get the pokemon that learn any of the listed moves
-    fun GetMoveLearnsetUnion(names: List<String>): List<String> {
+    fun getMoveLearnsetUnion(names: String): List<String> {
+        return getMoveLearnsetUnion(cleanPotentialListInput(names).split(","))
+    }
+
+    // Get the pokemon that learn any of the listed moves
+    fun getMoveLearnsetUnion(names: List<String>): List<String> {
         var learnset = mutableSetOf<String>()
         names.forEach { name ->
             val resp = this.apiClient.getMove(name)
