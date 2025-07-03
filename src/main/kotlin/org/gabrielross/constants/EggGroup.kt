@@ -48,7 +48,27 @@ enum class EggGroup() {
     Ditto,
 
     @SerialName("no-eggs-discovered")
-    NoEggsDiscovered;
+    NoEggsDiscovered,
+
+    // The following are names given to egg groups unique to the api
+    // Corresponds to: Field
+    @SerialName("ground")
+    Ground,
+
+    // Corresponds to: Grass
+    @SerialName("plant")
+    Plant,
+
+    // Corresponds to: HumanLike
+    @SerialName("humanshape")
+    HumanShape,
+
+    // Corresponds to: NoEggsDiscovered
+    @SerialName("no-eggs")
+    NoEggs,
+
+    @SerialName("indeterminate")
+    Indeterminate;
 
     override fun toString(): String = when(this) {
         Mineral -> "mineral"
@@ -66,5 +86,10 @@ enum class EggGroup() {
         Monster -> "monster"
         Ditto -> "ditto"
         NoEggsDiscovered -> "no-eggs-discovered"
+        Ground -> "ground"
+        Plant -> "plant"
+        HumanShape -> "humanshape"
+        NoEggs -> "no-eggs"
+        Indeterminate -> "indeterminate"
     }
 }
