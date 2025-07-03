@@ -26,4 +26,10 @@ class PokeinfoTest {
         val api = setup()
         println(api.getMoveLearnset("bullet-punch,swords-dance"))
     }
+
+    @Test
+    fun testPokemonCanLearnMove() {
+        val api = setup()
+        println(api.pokemonLearnsMove("scizor", "iron-head"))
+    }
 }

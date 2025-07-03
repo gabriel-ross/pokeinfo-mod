@@ -17,6 +17,9 @@ enum class MoveLearnMethod() {
     @SerialName("tutor")
     Tutor,
 
+    @SerialName("form-change")
+    FormChange,
+
     @SerialName("event")
     Event,
 
@@ -28,6 +31,7 @@ enum class MoveLearnMethod() {
         Machine -> "machine"
         Egg -> "egg"
         Tutor -> "tutor"
+        FormChange -> "form-change"
         Event -> "event"
         PriorEvolution -> "prior-evolution"
     }

@@ -3,11 +3,6 @@ package org.gabrielross.constants
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-fun FromString(name: String): GrowthRate {
-    val words = name.lowercase().split("-_ ")
-    return GrowthRate.valueOf(words.joinToString(""))
-}
-
 @Serializable
 enum class GrowthRate() {
 

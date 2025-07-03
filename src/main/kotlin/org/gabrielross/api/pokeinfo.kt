@@ -17,7 +17,7 @@ class Pokeinfo(
     fun calculateCandies(pokemonIdentifier: String, startLevel: Int, targetLevel: Int, candyInventory: CandyInventory = CandyInventory.max()): CandyCalculatorResponse {
         // Fetch pokemon growthrate from pokemon-species endpoint, then
         // fetch growth rate level data from growth-rate endpoint.
-        val growthRateData = this.apiClient.getGrowthRate(GrowthRate.valueOf(this.apiClient.getPokemonSpecies(pokemonIdentifier).growth_rate.name))
+        val growthRateData = this.apiClient.getGrowthRate(this.apiClient.getPokemonSpecies(pokemonIdentifier).growth_rate.toString())
         var start = growthRateData.levels[startLevel-1]
         var target = growthRateData.levels[targetLevel-1]
 
@@ -129,40 +129,6 @@ class Pokeinfo(
         } else if (searchEggMoves) {
             // todo: check egg moves
         }
-
-
-        // todo: only extract level-up/move data from the last generation
-        // todo: pawniard can learn swords dance from both tm and level up
-        // might need to manually iterate over version_group_details
-        // todo: consider making a private helper function for iterating
-        // over moves and adding them to a learnable moves list
-        // like if pokemonLearnsMove is called on bisharp I would want to call the helper function
-        // on pawniard
-        // todo: consider making a map of the move and its learn methods
-        // or an object
-//        var moveEntries: org.gabrielross.client.response.Move
-//        if (!includeMachines) {
-//            val moveEntries = pkData.moves.filter { move ->
-//                move.move.name == moveIdentifier
-//            }
-//        } else {
-//            val pkData = this.apiClient.getPokemon(pokemonIdentifier)
-//            val moveEntry = pkData.moves.find { move ->
-//                move.move.name == moveIdentifier
-//            }
-//        }
-//
-//
-//        // If pokemon learns move by level up
-//        if (moveEntry != null) {
-//            return LearnableMove(
-//                pokemonIdentifier,
-//                moveIdentifier,
-//                moveEntry.version_group_details[moveEntry.version_group_details.size-1].move_learn_method.name,
-//                moveEntry.version_group_details[moveEntry.version_group_details.size-1].level_learned_at
-//            )
-//        }
-
 
         return canLearnMove
     }
