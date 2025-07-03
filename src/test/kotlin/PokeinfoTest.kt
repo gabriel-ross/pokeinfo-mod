@@ -30,6 +30,18 @@ class PokeinfoTest {
     @Test
     fun testPokemonCanLearnMove() {
         val api = setup()
-        println(api.pokemonLearnsMove("scizor", "iron-head"))
+        val learnsByLevelUpAndMachine = api.pokemonLearnsMove("scizor", "iron-head")
+        assertEquals(true, learnsByLevelUpAndMachine.canLearnMove)
+        assertEquals(36, learnsByLevelUpAndMachine.levelLearnedAt)
+        assertEquals(true, learnsByLevelUpAndMachine.learnsByLevelUp)
+        assertEquals(true, learnsByLevelUpAndMachine.learnsByMachine)
+
+        val cannotLearnMove = api.pokemonLearnsMove("scizor", "flamethrower")
+        assertEquals(false, cannotLearnMove.canLearnMove)
+
+        val learnsByEvolution = api.pokemonLearnsMove("scizor", "bullet-punch")
+        assertEquals(true, learnsByEvolution.canLearnMove)
+        assertEquals(0, learnsByEvolution.levelLearnedAt)
+        assertEquals(true, learnsByEvolution.learnsByLevelUp)
     }
 }

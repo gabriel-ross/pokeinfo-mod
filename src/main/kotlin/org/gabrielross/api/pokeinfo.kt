@@ -97,7 +97,12 @@ class Pokeinfo(
         return learnsetIntersects.toList()
     }
 
-    // Returns the methods by which a pokemon can learn a move.
+    // Returns the methods by which a pokemon can learn a move. Moves that are
+    // learned upon evolution will be listed as LevelUp moves learned at level 0.
+    //
+    // when a Pokemon that learn a move by both evolution and level-up the
+    // response.levelLearnedAt field set to the latest level at which they
+    // learn the move.
     //
     // Note: Calling this with the searchEggMoves flag enabled on evolved pokemon
     // is a relatively expensive operation. Evolved pokemon do not have their
@@ -118,7 +123,11 @@ class Pokeinfo(
             canLearnMove.canLearnMove = true
             moveEntries.version_group_details.forEach { it ->
                 if (it.move_learn_method.name == MoveLearnMethod.LevelUp) {
-                    canLearnMove.learnsByLevelUp = true
+                    if (canLearnMove.levelLearnedAt == 0) {
+                        canLearnMove.learnsByEvolution = true
+                    } else {
+                        canLearnMove.learnsByLevelUp = true
+                    }
                     canLearnMove.levelLearnedAt = it.level_learned_at
                 } else if (it.move_learn_method.name == MoveLearnMethod.Machine) {
                     canLearnMove.learnsByMachine = true
@@ -172,6 +181,7 @@ data class LearnableMove(
     var canLearnMove: Boolean,
     var levelLearnedAt: Int?,
     var learnsByLevelUp: Boolean = false,
+    var learnsByEvolution: Boolean = false,
     var learnsByMachine: Boolean = false,
     var learnsByBreeding: Boolean = false
 )
