@@ -2,6 +2,7 @@ package org.gabrielross.api
 
 import org.gabrielross.client.Client
 import org.gabrielross.client.response.SpeciesResponse
+import org.gabrielross.constants.EggGroup
 import org.gabrielross.constants.GrowthRate
 import org.gabrielross.constants.MoveLearnMethod
 import org.gabrielross.model.Ability
@@ -63,7 +64,7 @@ class Pokeinfo(
         return getMoveLearnset(cleanPotentialListInput(names).split(","))
     }
 
-    // Get the names of pokemon that learn all moves in names
+    // Get the names of pokemon that learn all listed moves
     fun getMoveLearnset(names: List<String>): List<String> {
         if (names.isEmpty()) {
             return emptyList()
@@ -157,22 +158,63 @@ class Pokeinfo(
         return learnset.toList()
     }
 
-    private fun cleanPotentialListInput(inp: String): String {
-        return inp.filterNot{c -> c == '[' || c == ']'}
-    }
-    private fun cleanNameInput(inp: String): String {
-        return inp.trim().replace("_", "-").replace(" ", "-")
+    // Get all pokemon that share an egg group with a given pokemon.
+    fun sharedEggGroupPokemon(pokemonIdentifier: String): List<String> {
+        var pokemon = mutableSetOf<String>()
+        val speciesResp = this.apiClient.getPokemonSpecies(pokemonIdentifier).egg_groups.forEach { it ->
+            this.apiClient.getEggGroup(it.name.toString()).pokemon_species.forEach { pk ->
+                pokemon.add(pk.name)
+            }
+        }
+
+        return pokemon.toList()
     }
 
-// todo
-//    fun getMoveLearnset(id: Int): List<String> {
-//
-//    }
+    // Checks whether two pokemon share an egg group. Returns false if either
+    // of the pokemon belong to any of the following egg groups:
+    // - NoEggs/NoEggsDiscovered
+    // - Indeterminate
+    //
+    // Returns true if either of the pokemon are ditto or if they share any
+    // egg groups.
+    fun pokemonShareEggGroup(pkIdentifier1: String, pkIdentifier2: String): Boolean {
+        val dittoName = "ditto"
+        val dittoId = "132"
+        if (pkIdentifier1 == dittoName ||
+            pkIdentifier1 == dittoId ||
+            pkIdentifier2 == dittoName ||
+            pkIdentifier2 == dittoId) {
+            return true
+        }
+        val pk1 = this.apiClient.getPokemonSpecies(pkIdentifier1)
+        val pk2 = this.apiClient.getPokemonSpecies(pkIdentifier2)
+        pk1.egg_groups.forEach { eg1 ->
+            pk2.egg_groups.forEach { eg2 ->
+                // Return true if either pokemon is ditto
+                if (eg1.name == EggGroup.NoEggs ||
+                    eg2.name == EggGroup.NoEggs ||
+                    eg1.name == EggGroup.Indeterminate ||
+                    eg2.name == EggGroup.Indeterminate) {
+                    return false
+                } else if (eg1.name == eg2.name) {
+                    return true
+                }
+            }
+        }
 
-// todo
-//    fun getMoveLearnset(ids: List<Int>): List<String> {
-//
-//    }
+        return false
+    }
+
+    // Helper methods for standardizing argument inputs
+    companion object {
+
+        private fun cleanPotentialListInput(inp: String): String {
+            return inp.filterNot{c -> c == '[' || c == ']'}
+        }
+        private fun cleanNameInput(inp: String): String {
+            return inp.trim().replace("_", "-").replace(" ", "-")
+        }
+    }
 }
 
 data class LearnableMove(
