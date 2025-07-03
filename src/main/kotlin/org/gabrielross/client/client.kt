@@ -70,7 +70,7 @@ open class Client constructor(
             .build()
 
         val resp = this.httpClient.newCall(req).execute()
-        if (!resp.isSuccessful) throw IOException("Client received invalid error code: ${resp.code}")
+        if (!resp.isSuccessful) throw IOException("Received invalid response code: ${resp.code} from ${req.url}")
 
         return resp.body!!
     }

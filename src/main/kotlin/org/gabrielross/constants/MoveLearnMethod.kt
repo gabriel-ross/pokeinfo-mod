@@ -23,18 +23,13 @@ enum class MoveLearnMethod() {
     @SerialName("prior-evolution")
     PriorEvolution;
 
-    companion object {
-        fun ValueOf(m: MoveLearnMethod): String {
-            when (m) {
-                LevelUp -> "level-up"
-                Machine -> "machine"
-                Egg -> "egg"
-                Tutor -> "tutor"
-                Event -> "event"
-                PriorEvolution -> "prior-evolution"
-            }
-            return ""
-        }
+    override fun toString(): String = when(this) {
+        LevelUp -> "level-up"
+        Machine -> "machine"
+        Egg -> "egg"
+        Tutor -> "tutor"
+        Event -> "event"
+        PriorEvolution -> "prior-evolution"
     }
 }
 

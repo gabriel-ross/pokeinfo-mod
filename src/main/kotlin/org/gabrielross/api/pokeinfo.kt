@@ -97,38 +97,74 @@ class Pokeinfo(
         return learnsetIntersects.toList()
     }
 
+    // Returns the methods by which a pokemon can learn a move.
+    //
+    // Note: Calling this with the searchEggMoves flag enabled on evolved pokemon
+    // is a relatively expensive operation. Evolved pokemon do not have their
+    // egg moves listed in their learnsets and fetching this data requires
+    // the parsing of all pre-evolutions' learnsets.
     fun pokemonLearnsMove(
         pokemonIdentifier: String,
         moveIdentifier: String,
-        includeMachines: Boolean = false,
-        includeEggMoves: Boolean = false
+        searchEggMoves: Boolean = false,
+        onlyIncludeLatestVersion: Boolean = true
         ): LearnableMove {
 
-        if (!includeMachines) {
-            val pkData = this.apiClient.getPokemon(pokemonIdentifier)
-            val moveEntry = pkData.moves.find { move ->
-                move.move.name == moveIdentifier
+        var canLearnMove = LearnableMove(pokemonIdentifier, moveIdentifier, false, null)
+        var moves = this.apiClient.getPokemon(pokemonIdentifier)
+        var moveEntries = moves.moves.find { it.move.name == moveIdentifier }
+
+        if (moveEntries != null) {
+            canLearnMove.canLearnMove = true
+            moveEntries.version_group_details.forEach { it ->
+                if (it.move_learn_method.name == MoveLearnMethod.LevelUp) {
+                    canLearnMove.learnsByLevelUp = true
+                    canLearnMove.levelLearnedAt = it.level_learned_at
+                } else if (it.move_learn_method.name == MoveLearnMethod.Machine) {
+                    canLearnMove.learnsByMachine = true
+                } else if (it.move_learn_method.name == MoveLearnMethod.Egg) {
+                    canLearnMove.learnsByBreeding = true
+                }
             }
-        } else {
-            val pkData = this.apiClient.getPokemon(pokemonIdentifier)
-            val moveEntry = pkData.moves.find { move ->
-                move.move.name == moveIdentifier
-            }
+        } else if (searchEggMoves) {
+            // todo: check egg moves
         }
 
 
-        // If pokemon learns move by level up
-        if (moveEntry != null) {
-            return LearnableMove(
-                pokemonIdentifier,
-                moveIdentifier,
-                moveEntry.version_group_details[moveEntry.version_group_details.size-1].move_learn_method.name,
-                moveEntry.version_group_details[moveEntry.version_group_details.size-1].level_learned_at
-            )
-        }
+        // todo: only extract level-up/move data from the last generation
+        // todo: pawniard can learn swords dance from both tm and level up
+        // might need to manually iterate over version_group_details
+        // todo: consider making a private helper function for iterating
+        // over moves and adding them to a learnable moves list
+        // like if pokemonLearnsMove is called on bisharp I would want to call the helper function
+        // on pawniard
+        // todo: consider making a map of the move and its learn methods
+        // or an object
+//        var moveEntries: org.gabrielross.client.response.Move
+//        if (!includeMachines) {
+//            val moveEntries = pkData.moves.filter { move ->
+//                move.move.name == moveIdentifier
+//            }
+//        } else {
+//            val pkData = this.apiClient.getPokemon(pokemonIdentifier)
+//            val moveEntry = pkData.moves.find { move ->
+//                move.move.name == moveIdentifier
+//            }
+//        }
+//
+//
+//        // If pokemon learns move by level up
+//        if (moveEntry != null) {
+//            return LearnableMove(
+//                pokemonIdentifier,
+//                moveIdentifier,
+//                moveEntry.version_group_details[moveEntry.version_group_details.size-1].move_learn_method.name,
+//                moveEntry.version_group_details[moveEntry.version_group_details.size-1].level_learned_at
+//            )
+//        }
 
 
-        return LearnableMove("scizor", "bullet-punch", MoveLearnMethod.levelup, 1)
+        return canLearnMove
     }
 
     // Get the pokemon that learn any of the listed moves
@@ -167,6 +203,9 @@ class Pokeinfo(
 data class LearnableMove(
     val pokemon: String,
     val move: String,
-    val learnMethod: MoveLearnMethod,
-    val levelLearnedAt: Int?
+    var canLearnMove: Boolean,
+    var levelLearnedAt: Int?,
+    var learnsByLevelUp: Boolean = false,
+    var learnsByMachine: Boolean = false,
+    var learnsByBreeding: Boolean = false
 )

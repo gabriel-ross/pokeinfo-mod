@@ -1,3 +1,4 @@
+import okhttp3.Request
 import org.gabrielross.api.CandyInventory
 import org.gabrielross.api.ExperienceCalculator
 import org.gabrielross.constants.GrowthRate
@@ -9,10 +10,10 @@ data class foo(var a: Int)
 class CalculatorTest {
 
     @Test fun demo() {
-        val a = GrowthRate.MediumSlow.name
-        println()
-        println(a)
-        println(150.floorDiv(100))
+        val req = Request.Builder()
+            .url("http://hellobase/someendpoint")
+            .build()
+        println(req.url)
     }
 
     @Test

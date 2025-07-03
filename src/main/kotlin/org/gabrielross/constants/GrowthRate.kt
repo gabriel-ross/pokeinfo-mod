@@ -29,17 +29,12 @@ enum class GrowthRate() {
     @SerialName("fast-then-very-slow")
     Erratic;
 
-    companion object {
-        fun valueOf(g: GrowthRate): String {
-            when (g) {
-                Slow -> "slow"
-                Medium -> "medium"
-                Fast -> "fast"
-                MediumSlow -> "medium-slow"
-                Fluctuating -> "slow-then-very-fast"
-                Erratic -> "fast-then-very-slow"
-            }
-            return ""
-        }
+    override fun toString(): String = when(this) {
+        Slow -> "slow"
+        Medium -> "medium"
+        Fast -> "fast"
+        MediumSlow -> "medium-slow"
+        Fluctuating -> "slow-then-very-fast"
+        Erratic -> "fast-then-very-slow"
     }
 }
