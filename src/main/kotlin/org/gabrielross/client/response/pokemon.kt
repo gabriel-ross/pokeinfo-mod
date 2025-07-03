@@ -10,6 +10,7 @@ data class PokemonResponse(
     val id: Int,
     val abilities: List<Ability>,
     val moves: List<Move>,
+    val species: ShortEntry<String>,
     val stats: List<Stat>,
     val types: List<PokemonType>
 )
