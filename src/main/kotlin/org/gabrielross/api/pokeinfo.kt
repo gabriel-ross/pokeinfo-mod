@@ -38,10 +38,10 @@ class Pokeinfo(
     // to retrieve id from the /pokemon-species endpoint and then re-attempt to
     // fetch pokemon data using id.
     fun getPokemon(identifier: String): Pokemon {
-        try {
-            return Pokemon.fromResponse(this.apiClient.getPokemon(identifier))
+        return try {
+            Pokemon.fromResponse(this.apiClient.getPokemon(identifier))
         } catch (e: IOException) {
-            return Pokemon.fromResponse(this.apiClient.getPokemon(this.apiClient.getPokemonSpecies(identifier).id.toString()))
+            Pokemon.fromResponse(this.apiClient.getPokemon(this.apiClient.getPokemonSpecies(identifier).id.toString()))
         }
     }
 
