@@ -25,6 +25,18 @@ class PokeinfoTest {
     }
 
     @Test
+    fun testAbilityLearnset() {
+        val api = setup()
+        println(api.getAbilityLearnset("technician"))
+    }
+
+    @Test
+    fun testSearchByAbilityMove() {
+        val api = setup()
+        println(api.getAbilityAndMoveLearnset("technician", "bullet-punch,swords-dance"))
+    }
+
+    @Test
     fun testCompoundLearnset() {
         val api = setup()
         println(api.getMoveLearnset("bullet-punch,swords-dance"))

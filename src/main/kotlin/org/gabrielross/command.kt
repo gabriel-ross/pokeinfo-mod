@@ -34,11 +34,18 @@ class PokemonCommand {
                     .executes { ctx ->
                         canBreed(ctx.source, getString(ctx, "identifier1"), getString(ctx, "identifier2"), api)
                     }))
+            val lookup = Commands.literal("lookup")
+                .then(Commands.argument("ability", StringArgumentType.string())
+                    .then(Commands.argument("moves", StringArgumentType.string())
+                    .executes { ctx ->
+                        searchByAbilityMove(ctx.source, getString(ctx, "ability"), getString(ctx, "moves"), api)
+                    }))
 
             baseCmd.then(abilities)
             baseCmd.then(evYield)
             baseCmd.then(breedsWith)
             baseCmd.then(canBreed)
+            baseCmd.then(lookup)
             dispatcher.register(baseCmd)
         }
 
@@ -64,6 +71,11 @@ class PokemonCommand {
 
         fun canBreed(source: CommandSourceStack, identifier1: String, identifier2: String, api: Pokeinfo): Int {
             source.sendSystemMessage(Component.literal(api.canBreed(identifier1, identifier2).toString()))
+            return 1
+        }
+
+        fun searchByAbilityMove(source: CommandSourceStack, ability: String, moves: String, api: Pokeinfo): Int {
+            source.sendSystemMessage(Component.literal(api.getAbilityAndMoveLearnset(ability, moves).toString()))
             return 1
         }
     }

@@ -61,14 +61,18 @@ class Pokeinfo(
 
     // Lookup pokemon that have access to ability and learn the provided moves.
     fun getAbilityAndMoveLearnset(ability: String, moves: List<String>): List<String> {
+        if (ability.isEmpty() || moves.isEmpty()) {
+            return emptyList()
+        }
         var learnset = abilityLearnset(ability)
-        var intersects = mutableSetOf<String>()
-        moves.forEach { move ->
-            this.apiClient.getMove(move).learned_by_pokemon.forEach { pk ->
-                if (learnset.contains(pk.name)) { intersects.add(pk.name) }
-                learnset = intersects
-                intersects.clear()
+        moves.forEach { mv ->
+            var intersects = mutableSetOf<String>()
+            this.apiClient.getMove(cleanNameInput(mv)).learned_by_pokemon.forEach { pk ->
+                if (learnset.contains(pk.name)) {
+                    intersects.add(pk.name)
+                }
             }
+            learnset = intersects
         }
 
         return learnset.toList()
