@@ -9,6 +9,7 @@ import org.gabrielross.model.Ability
 import org.gabrielross.model.Move
 import org.gabrielross.model.Pokemon
 import org.gabrielross.model.SpeciesData
+import java.io.IOException
 import kotlin.text.replace
 
 class Pokeinfo(
@@ -33,8 +34,15 @@ class Pokeinfo(
         return ExperienceCalculator.calculateCandies(target.experience - start.experience, candyInventory)
     }
 
+    // Get pokemon data. If fetching fails for the given identifier will attempt
+    // to retrieve id from the /pokemon-species endpoint and then re-attempt to
+    // fetch pokemon data using id.
     fun getPokemon(identifier: String): Pokemon {
-        return Pokemon.fromResponse(this.apiClient.getPokemon(identifier))
+        try {
+            return Pokemon.fromResponse(this.apiClient.getPokemon(identifier))
+        } catch (e: IOException) {
+            return Pokemon.fromResponse(this.apiClient.getPokemon(this.apiClient.getPokemonSpecies(identifier).id.toString()))
+        }
     }
 
     fun getPokemonSpecies(identifier: String): SpeciesData {
