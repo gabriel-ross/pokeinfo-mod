@@ -25,9 +25,20 @@ class PokemonCommand {
             val evYield = Commands.literal("evyield").then(Commands.argument("identifier", greedyString()).executes { ctx ->
                 evYield(ctx.source, getString(ctx, "identifier"), api)
             })
+            val breedsWith = Commands.literal("breedswith").then(Commands.argument("identifier", greedyString()).executes { ctx ->
+                breedsWith(ctx.source, getString(ctx, "identifier"), api)
+            })
+            val canBreed = Commands.literal("canbreed")
+                .then(Commands.argument("identifier1", StringArgumentType.string())
+                    .then(Commands.argument("identifier2", StringArgumentType.string())
+                    .executes { ctx ->
+                        canBreed(ctx.source, getString(ctx, "identifier1"), getString(ctx, "identifier2"), api)
+                    }))
 
             baseCmd.then(abilities)
             baseCmd.then(evYield)
+            baseCmd.then(breedsWith)
+            baseCmd.then(canBreed)
             dispatcher.register(baseCmd)
         }
 
@@ -43,6 +54,16 @@ class PokemonCommand {
 
         fun evYield(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
             source.sendSystemMessage(Component.literal(api.getPokemon(identifier).Data().evYield.toString()))
+            return 1
+        }
+
+        fun breedsWith(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
+            source.sendSystemMessage(Component.literal(api.getBreedablePokemon(identifier).joinToString(",")))
+            return 1
+        }
+
+        fun canBreed(source: CommandSourceStack, identifier1: String, identifier2: String, api: Pokeinfo): Int {
+            source.sendSystemMessage(Component.literal(api.canBreed(identifier1, identifier2).toString()))
             return 1
         }
     }

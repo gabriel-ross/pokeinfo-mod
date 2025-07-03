@@ -167,7 +167,7 @@ class Pokeinfo(
     }
 
     // Get all pokemon that share an egg group with a given pokemon.
-    fun sharedEggGroup(pokemonIdentifier: String): List<String> {
+    fun getBreedablePokemon(pokemonIdentifier: String): List<String> {
         var pokemon = mutableSetOf<String>()
         val speciesResp = this.apiClient.getPokemonSpecies(pokemonIdentifier).egg_groups.forEach { it ->
             this.apiClient.getEggGroup(it.name.toString()).pokemon_species.forEach { pk ->

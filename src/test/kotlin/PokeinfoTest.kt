@@ -49,7 +49,7 @@ class PokeinfoTest {
     }
 
     @Test
-    fun testGetSharedEggGroups() {
+    fun testBreedablePokemon() {
         val cl = Client("https://pokeapi.co/api/v2", OkHttpClient())
         val api = Pokeinfo(cl)
         var expectedPokemon = mutableSetOf<String>()
@@ -60,7 +60,7 @@ class PokeinfoTest {
             expectedPokemon.add(it.name)
         }
 
-        val resp = api.sharedEggGroup("finizen")
+        val resp = api.getBreedablePokemon("finizen")
         for (i in 1..10) {
             val pk = expectedPokemon.random()
             assertContains(resp, pk)
