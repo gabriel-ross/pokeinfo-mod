@@ -55,14 +55,27 @@ class Pokeinfo(
         return Ability.FromResponse(this.apiClient.getAbility(identifier))
     }
 
-    fun getAbilityLearnset(name: String): List<String> {
-        val resp = this.apiClient.getAbility(cleanNameInput(name))
-        var learnset = mutableListOf<String>()
-        resp.pokemon.forEach { pokemon ->
-            if (pokemon.pokemon.name.contains("-gmax")) return@forEach
-            learnset.add(pokemon.pokemon.name)
+    fun getAbilityAndMoveLearnset(ability: String, moves: String): List<String> {
+        return getAbilityAndMoveLearnset(ability, cleanPotentialListInput(moves).split(","))
+    }
+
+    // Lookup pokemon that have access to ability and learn the provided moves.
+    fun getAbilityAndMoveLearnset(ability: String, moves: List<String>): List<String> {
+        var learnset = abilityLearnset(ability)
+        var intersects = mutableSetOf<String>()
+        moves.forEach { move ->
+            this.apiClient.getMove(move).learned_by_pokemon.forEach { pk ->
+                if (learnset.contains(pk.name)) { intersects.add(pk.name) }
+                learnset = intersects
+                intersects.clear()
+            }
         }
-        return learnset
+
+        return learnset.toList()
+    }
+
+    fun getAbilityLearnset(name: String): List<String> {
+        return abilityLearnset(name).toList()
     }
 
     // Get the names of pokemon that learn a move
@@ -214,6 +227,26 @@ class Pokeinfo(
         }
 
         return false
+    }
+
+    // Helper function for fetching an ability's learnset
+    private fun abilityLearnset(identifier: String): MutableSet<String> {
+        var learnset = mutableSetOf<String>()
+        this.apiClient.getAbility(cleanNameInput(identifier)).pokemon.forEach { it ->
+            if (it.pokemon.name.contains("-gmax")) return@forEach
+            learnset.add(it.pokemon.name)
+        }
+        return learnset
+    }
+
+    // Helper function for fetching a moves's learnset
+    private fun moveLearnset(identifier: String): MutableSet<String> {
+        var learnset = mutableSetOf<String>()
+        this.apiClient.getMove(cleanNameInput(identifier)).learned_by_pokemon.forEach { it ->
+            if (it.name.contains("-mega") || it.name.contains("-gmax")) return@forEach
+            learnset.add(it.name)
+        }
+        return learnset
     }
 
     // Helper methods for standardizing argument inputs
