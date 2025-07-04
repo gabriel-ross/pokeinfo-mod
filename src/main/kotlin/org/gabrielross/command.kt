@@ -35,6 +35,13 @@ class PokemonCommand {
                     .executes { ctx ->
                         canBreed(ctx.source, getString(ctx, "identifier1"), getString(ctx, "identifier2"), api)
                     }))
+            val learnsMove = Commands.literal("learnsmove")
+                .then(Commands.argument("pokemon", StringArgumentType.string())
+                    .then(Commands.argument("move", StringArgumentType.string())
+                        .executes { ctx ->
+                            learnsMove(ctx.source, getString(ctx, "pokemon"), getString(ctx, "move"), api)
+                        }
+                    ))
             val search = Commands.literal("search")
                 .then(Commands.argument("ability", StringArgumentType.string())
                     .then(Commands.argument("moves", StringArgumentType.string())
@@ -47,6 +54,7 @@ class PokemonCommand {
             baseCmd.then(evYield)
             baseCmd.then(breedsWith)
             baseCmd.then(canBreed)
+            baseCmd.then(learnsMove)
             baseCmd.then(search)
             dispatcher.register(baseCmd)
         }
@@ -73,6 +81,11 @@ class PokemonCommand {
 
         fun canBreed(source: CommandSourceStack, identifier1: String, identifier2: String, api: Pokeinfo): Int {
             source.sendSystemMessage(Component.literal(api.canBreed(identifier1, identifier2).toString()))
+            return 1
+        }
+
+        fun learnsMove(source: CommandSourceStack, pokemon: String, move: String, api: Pokeinfo): Int {
+            source.sendSystemMessage(Component.literal(api.pokemonLearnsMove(pokemon, move).toString()))
             return 1
         }
 
@@ -222,6 +235,8 @@ val PokemonHelpCommand = """
     - /pokemon evYield {identifier}: retrieve the ev yield for a given pokemon
     - /pokemon breedsWith {identifier}: returns all pokemon that share en egg group with a given pokemon
     - /pokemon canBreed {identifier1} {identifier2}: returns whether two pokemon can breed
+    - /pokemon learnsmove {pokemon} {move}: Returns the ways in which a pokemon can learn a move
+        * Limitation: Does not currently support egg moves for evolved pokemon
     - /pokemon search {ability} {moves}: Returns all pokemon (including megas) that posess a given ability and the listed moves. 
         * moves can either be a single move or a comma-delimited list of moves
 """.trimIndent()
