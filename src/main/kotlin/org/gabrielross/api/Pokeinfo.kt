@@ -128,17 +128,19 @@ class Pokeinfo(
     // response.levelLearnedAt field set to the latest level at which they
     // learn the move.
     //
-    // Note: Calling this with the searchEggMoves flag enabled on evolved pokemon
-    // is a relatively expensive operation. Evolved pokemon do not have their
-    // egg moves listed in their learnsets and fetching this data requires
-    // the parsing of all pre-evolutions' learnsets.
+    // When the includePriorEvos flag is enabled this method will also
+    // search the movesets of prior evolutions and results will include
+    // moves that are potentially only learnable by a prior evolution
+    // (spore on breloom for example).
+    //
+    // Note: Searching prior evolutions is a relatively expensive operation.
     fun pokemonLearnsMove(
         pokemonIdentifier: String,
         moveIdentifier: String,
-        searchEggMoves: Boolean = false,
+        includePriorEvos: Boolean = false,
         onlyIncludeLatestVersion: Boolean = true
         ): LearnableMove {
-
+        // todo: should check if pokemon is baby and skip searching prior evos
         var canLearnMove = LearnableMove(pokemonIdentifier, moveIdentifier, false, null)
         var moves = this.apiClient.getPokemon(pokemonIdentifier)
         var moveEntries = moves.moves.find { it.move.name == moveIdentifier }
@@ -159,8 +161,8 @@ class Pokeinfo(
                     canLearnMove.learnsByBreeding = true
                 }
             }
-        } else if (searchEggMoves) {
-            // todo: check egg moves
+        } else if (includePriorEvos) {
+            // todo: check prior evo moves (including egg moves)
         }
 
         return canLearnMove
