@@ -9,6 +9,7 @@ import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
 import net.minecraft.network.chat.Component
 import org.gabrielross.api.Pokeinfo
+import org.gabrielross.constants.Nature
 
 
 class PokemonCommand {
@@ -175,6 +176,27 @@ class MoveCommand {
 
         fun learnsetOr(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
             source.sendSystemMessage(Component.literal(api.getMoveLearnsetUnion(identifier).toString()))
+            return 1
+        }
+    }
+}
+
+class NatureCommand {
+    companion object {
+        fun register (dispatcher: CommandDispatcher<CommandSourceStack>, api: Pokeinfo) {
+            val getNature = Commands.literal("nature").then(Commands.argument("nature", greedyString()).executes { ctx ->
+                getNature(ctx.source, getString(ctx, "nature"), api)
+            })
+            val listNatures = Commands.literal("list").executes { ctx ->
+                ctx.source.sendSystemMessage(Component.literal(Nature.entries.toString()))
+                1
+            }
+            getNature.then(listNatures)
+            dispatcher.register(getNature)
+        }
+
+        fun getNature(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
+            source.sendSystemMessage(Component.literal(api.natureDoes(identifier)))
             return 1
         }
     }

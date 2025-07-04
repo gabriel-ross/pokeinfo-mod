@@ -233,6 +233,11 @@ class Pokeinfo(
         return false
     }
 
+    fun natureDoes(identifier: String): String {
+        val nature = this.apiClient.getNature(identifier)
+        return "$identifier: +${nature.increased_stat.name} -${nature.decreased_stat.name}"
+    }
+
     // Helper function for fetching an ability's learnset
     private fun abilityLearnset(identifier: String): MutableSet<String> {
         var learnset = mutableSetOf<String>()

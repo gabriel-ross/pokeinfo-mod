@@ -35,6 +35,10 @@ object PokeInfo : ModInitializer {
         }
 
         CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
+            NatureCommand.register(dispatcher, pokeinfo)
+        }
+
+        CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
             BaseCommand.register(dispatcher)
         }
 

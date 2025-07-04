@@ -21,6 +21,7 @@ open class Client constructor(
     val typeEndpoint = "type"
     val growthRateEndpoint = "growth-rate"
     val eggGroupEndpoint = "egg-group"
+    val natureEndpoint = "nature"
 
     fun getPokemon(identifier: String): PokemonResponse {
         return UnmarshalStrategy.decodeFromString<PokemonResponse>(
@@ -61,6 +62,12 @@ open class Client constructor(
     fun getGrowthRate(identifier: String): GrowthRateResponse {
         return UnmarshalStrategy.decodeFromString<GrowthRateResponse>(
             this.makePokeAPIRequest("${this.growthRateEndpoint}/$identifier").string()
+        )
+    }
+
+    fun getNature(identifier: String): NatureResponse {
+        return UnmarshalStrategy.decodeFromString<NatureResponse>(
+            this.makePokeAPIRequest("${this.natureEndpoint}/$identifier").string()
         )
     }
 
