@@ -27,6 +27,9 @@ class PokemonCommand {
             val evYield = Commands.literal("evyield").then(Commands.argument("identifier", greedyString()).executes { ctx ->
                 evYield(ctx.source, getString(ctx, "identifier"), api)
             })
+            val catchRate = Commands.literal("catchrate").then(Commands.argument("identifier", greedyString()).executes { ctx ->
+                catchRate(ctx.source, getString(ctx, "identifier"), api)
+            })
             val breedsWith = Commands.literal("breedswith").then(Commands.argument("identifier", greedyString()).executes { ctx ->
                 breedsWith(ctx.source, getString(ctx, "identifier"), api)
             })
@@ -50,9 +53,11 @@ class PokemonCommand {
                         searchByAbilityMove(ctx.source, getString(ctx, "ability"), getString(ctx, "moves"), api)
                     }))
 
+
             baseCmd.then(generateHelpCommand(PokemonHelpCommand))
             baseCmd.then(abilities)
             baseCmd.then(evYield)
+            baseCmd.then(catchRate)
             baseCmd.then(breedsWith)
             baseCmd.then(canBreed)
             baseCmd.then(learnsMove)
@@ -72,6 +77,11 @@ class PokemonCommand {
 
         fun evYield(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
             source.sendSystemMessage(Component.literal(api.getPokemon(identifier).Data().evYield.toString()))
+            return 1
+        }
+
+        fun catchRate(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
+            source.sendSystemMessage(Component.literal(api.getPokemonSpecies(identifier).captureRate.toString()))
             return 1
         }
 

@@ -1,5 +1,7 @@
 package org.gabrielross.model
 
+import org.gabrielross.constants.Stat
+
 data class Stats(
     var hp: Int = 0,
     var atk: Int = 0,

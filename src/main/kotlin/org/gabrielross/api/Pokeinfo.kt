@@ -278,5 +278,7 @@ data class LearnableMove(
     var learnsByLevelUp: Boolean = false,
     var learnsByEvolution: Boolean = false,
     var learnsByMachine: Boolean = false,
-    var learnsByBreeding: Boolean = false
+    var learnsByBreeding: Boolean = false,
+    var learnsByPriorEvolution: Boolean = false,
+    var priorEvoLearnMethod: LearnableMove? = null
 )
