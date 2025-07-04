@@ -35,10 +35,10 @@ object PokeInfo : ModInitializer {
         }
 
         CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
-            HelpCommand.register(dispatcher)
+            BaseCommand.register(dispatcher)
         }
 
 
-        logger.info("Hello Fabric world!")
+        logger.info("Pokeinfo is running")
     }
 }
