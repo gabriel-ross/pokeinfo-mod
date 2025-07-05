@@ -48,7 +48,7 @@ class PokemonCommand {
                     ))
             val search = Commands.literal("search")
                 .then(Commands.argument("ability", StringArgumentType.string())
-                    .then(Commands.argument("moves", StringArgumentType.string())
+                    .then(Commands.argument("moves", greedyString())
                     .executes { ctx ->
                         searchByAbilityMove(ctx.source, getString(ctx, "ability"), getString(ctx, "moves"), api)
                     }))

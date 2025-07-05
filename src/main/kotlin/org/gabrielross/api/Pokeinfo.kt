@@ -1,6 +1,7 @@
 package org.gabrielross.api
 
 import org.gabrielross.client.Client
+import org.gabrielross.client.response.EvolutionChainResponse
 import org.gabrielross.constants.EggGroup
 import org.gabrielross.constants.MoveLearnMethod
 import org.gabrielross.model.Ability
@@ -188,9 +189,15 @@ class Pokeinfo(
         return learnset.toList()
     }
 
-    // Filters the given list and returns only the pokemon that are fully evolved.
-    fun filterFullyEvolved(pokemonNames: List<String>): List<String> {
-        return emptyList()
+    // Return whether a pokemon is fully evolved
+    fun isFullyEvolved(pokemon: String): Boolean {
+        val evoChain = this.apiClient.makeRequest<EvolutionChainResponse>(this.apiClient.getPokemonSpecies(pokemon).evolution_chain.url).chain
+        if (evoChain.species.name == pokemon && evoChain.evolves_to.isEmpty()) {
+            return true
+        } else if (evoChain.species.name == pokemon && !evoChain.evolves_to.isEmpty()) {
+            return false
+        }
+        return false
     }
 
     // Get all pokemon that share an egg group with a given pokemon.
