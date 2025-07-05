@@ -35,8 +35,8 @@ class PokeinfoTest {
 
     @Test
     fun testAbilityLearnset() {
-        val api = setup()
-        println(api.getAbilityLearnset("technician"))
+//        val api = setup()
+//        println(api.getAbilityLearnset("technician", true))
     }
 
     @Test
@@ -67,6 +67,13 @@ class PokeinfoTest {
         assertEquals(true, learnsByEvolution.canLearnMove)
         assertEquals(0, learnsByEvolution.levelLearnedAt)
         assertEquals(true, learnsByEvolution.learnsByLevelUp)
+    }
+
+    @Test
+    fun testIsFullyEvolved() {
+        val api = setup()
+        println(api.isFullyEvolved("scizor"))
+        println(api.isFullyEvolved("scyther"))
     }
 
     @Test

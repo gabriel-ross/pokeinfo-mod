@@ -1,13 +1,16 @@
 package org.gabrielross
 
 import com.mojang.brigadier.CommandDispatcher
+import com.mojang.brigadier.arguments.BoolArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType.getString
 import com.mojang.brigadier.arguments.StringArgumentType.greedyString
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import com.sun.jdi.connect.Connector
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
 import net.minecraft.network.chat.Component
+import org.gabrielross.PokemonCommand.Companion.searchByAbilityMove
 import org.gabrielross.api.Pokeinfo
 import org.gabrielross.constants.Nature
 
@@ -50,8 +53,11 @@ class PokemonCommand {
                 .then(Commands.argument("ability", StringArgumentType.string())
                     .then(Commands.argument("moves", greedyString())
                     .executes { ctx ->
-                        searchByAbilityMove(ctx.source, getString(ctx, "ability"), getString(ctx, "moves"), api)
-                    }))
+                        searchByAbilityMove(ctx.source, getString(ctx, "ability"), getString(ctx, "moves"), false, api)
+                    }.then(Commands.argument("onlyFullyEvolved", BoolArgumentType.bool())
+                        .executes { ctx ->
+                            searchByAbilityMove(ctx.source, getString(ctx, "ability"), getString(ctx, "moves"), BoolArgumentType.getBool(ctx, "onlyFullyEvolved"), api)
+                        })))
 
 
             baseCmd.then(generateHelpCommand(PokemonHelpCommand))
@@ -100,7 +106,7 @@ class PokemonCommand {
             return 1
         }
 
-        fun searchByAbilityMove(source: CommandSourceStack, ability: String, moves: String, api: Pokeinfo): Int {
+        fun searchByAbilityMove(source: CommandSourceStack, ability: String, moves: String, filterFullyEvolved: Boolean, api: Pokeinfo): Int {
             source.sendSystemMessage(Component.literal(api.getAbilityAndMoveLearnset(ability, moves).toString()))
             return 1
         }
@@ -117,9 +123,12 @@ class AbilityCommand {
             val effect = Commands.literal("effect").then(Commands.argument("identifier", greedyString()).executes { ctx ->
                 abilityEffect(ctx.source, getString(ctx, "identifier"), api)
             })
-            val learnset = Commands.literal("learnset").then(Commands.argument("identifier", greedyString()).executes { ctx ->
-                abilityLearnset(ctx.source, getString(ctx, "identifier"), api)
-            })
+            val learnset = Commands.literal("learnset").then(Commands.argument("identifier",
+                StringArgumentType.string()).executes { ctx ->
+                abilityLearnset(ctx.source, getString(ctx, "identifier"), false, api)
+            }.then(Commands.argument("onlyFullyEvolved", BoolArgumentType.bool()).executes { ctx ->
+                abilityLearnset(ctx.source, getString(ctx, "identifier"), BoolArgumentType.getBool(ctx, "onlyFullyEvolved"), api)
+            }))
 
             baseCmd.then(generateHelpCommand(AbilityHelpCommand))
             baseCmd.then(effect)
@@ -137,8 +146,8 @@ class AbilityCommand {
             return 1
         }
 
-        fun abilityLearnset(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
-            source.sendSystemMessage(Component.literal(api.getAbilityLearnset(identifier).toString()))
+        fun abilityLearnset(source: CommandSourceStack, identifier: String, onlyFullyEvolved: Boolean, api: Pokeinfo): Int {
+            source.sendSystemMessage(Component.literal(api.getAbilityLearnset(identifier, onlyFullyEvolved).toString()))
             return 1
         }
     }
@@ -155,12 +164,18 @@ class MoveCommand {
             val effect = Commands.literal("effect").then(Commands.argument("identifier", greedyString()).executes { ctx ->
                 moveEffect(ctx.source, getString(ctx, "identifier"), api)
             })
-            val learnsetIntersect = Commands.literal("learnset").then(Commands.argument("identifier", greedyString()).executes { ctx ->
-                learnsetIntersect(ctx.source, getString(ctx, "identifier"), api)
-            })
-            val learnsetOr = Commands.literal("learnsetor").then(Commands.argument("identifier", greedyString()).executes { ctx ->
-                learnsetOr(ctx.source, getString(ctx, "identifier"), api)
-            })
+            val learnsetIntersect = Commands.literal("learnset").then(Commands.argument("moves", greedyString()).executes { ctx ->
+                learnsetIntersect(ctx.source, getString(ctx, "moves"), false, api)
+            }.then(Commands.argument("onlyFullyEvolved", BoolArgumentType.bool())
+                .executes { ctx ->
+                    learnsetIntersect(ctx.source, getString(ctx, "moves"), BoolArgumentType.getBool(ctx, "onlyFullyEvolved"), api)
+                }))
+            val learnsetOr = Commands.literal("learnsetor").then(Commands.argument("moves", greedyString()).executes { ctx ->
+                learnsetOr(ctx.source, getString(ctx, "moves"), false, api)
+            }.then(Commands.argument("onlyFullyEvolved", BoolArgumentType.bool())
+                .executes { ctx ->
+                    learnsetOr(ctx.source, getString(ctx, "moves"), BoolArgumentType.getBool(ctx, "onlyFullyEvolved"), api)
+                }))
 
             baseCmd.then(generateHelpCommand(MoveHelpCommand))
             baseCmd.then(effect)
@@ -179,13 +194,13 @@ class MoveCommand {
             return 1
         }
 
-        fun learnsetIntersect(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
-            source.sendSystemMessage(Component.literal(api.getMoveLearnset(identifier).toString()))
+        fun learnsetIntersect(source: CommandSourceStack, identifier: String, onlyFullyEvolved: Boolean, api: Pokeinfo): Int {
+            source.sendSystemMessage(Component.literal(api.getMoveLearnset(identifier, onlyFullyEvolved).toString()))
             return 1
         }
 
-        fun learnsetOr(source: CommandSourceStack, identifier: String, api: Pokeinfo): Int {
-            source.sendSystemMessage(Component.literal(api.getMoveLearnsetUnion(identifier).toString()))
+        fun learnsetOr(source: CommandSourceStack, identifier: String, onlyFullyEvolved: Boolean, api: Pokeinfo): Int {
+            source.sendSystemMessage(Component.literal(api.getMoveLearnsetUnion(identifier, onlyFullyEvolved).toString()))
             return 1
         }
     }
