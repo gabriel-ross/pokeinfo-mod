@@ -3,7 +3,7 @@ package org.gabrielross.client
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.ResponseBody
-import org.gabrielross.client.response.*
+import org.gabrielross.client.model.*
 import org.gabrielross.constants.Type
 import org.gabrielross.constants.UnmarshalStrategy
 import java.io.IOException

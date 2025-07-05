@@ -1,4 +1,4 @@
-package org.gabrielross.client.response
+package org.gabrielross.client.model
 
 import kotlinx.serialization.Serializable
 import org.gabrielross.constants.DamageClass
