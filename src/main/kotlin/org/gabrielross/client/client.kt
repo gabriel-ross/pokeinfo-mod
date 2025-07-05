@@ -78,6 +78,20 @@ open class Client constructor(
         )
     }
 
+    // Make a request given a full url. Useful for making requests using the
+    // url field of other response objects without having to extract the
+    // endpoint and id of the resource.
+    inline fun <reified T>makeRequest(url: String): T {
+        val req = Request.Builder()
+            .url(url)
+            .build()
+
+        val resp = this.httpClient.newCall(req).execute()
+        if (!resp.isSuccessful) throw IOException("Received invalid response code: ${resp.code} from ${req.url}")
+
+        return UnmarshalStrategy.decodeFromString(resp.body!!.string())
+    }
+
     private fun makePokeAPIRequest(endpoint: String): ResponseBody {
         val req = Request.Builder()
             .url("${this.baseUrl}/$endpoint")

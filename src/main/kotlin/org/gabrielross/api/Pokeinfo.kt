@@ -188,6 +188,11 @@ class Pokeinfo(
         return learnset.toList()
     }
 
+    // Filters the given list and returns only the pokemon that are fully evolved.
+    fun filterFullyEvolved(pokemonNames: List<String>): List<String> {
+        return emptyList()
+    }
+
     // Get all pokemon that share an egg group with a given pokemon.
     fun getBreedablePokemon(pokemonIdentifier: String): List<String> {
         var pokemon = mutableSetOf<String>()

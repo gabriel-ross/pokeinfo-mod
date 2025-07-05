@@ -1,6 +1,7 @@
 import okhttp3.OkHttpClient
 import org.gabrielross.api.Pokeinfo
 import org.gabrielross.client.Client
+import org.gabrielross.client.response.EvolutionChainResponse
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import kotlin.random.Random
@@ -15,11 +16,12 @@ class PokeinfoTest {
     }
 
     @Test
-    fun foo() {
+    fun testGetEvolutionChain() {
         val baseHTTPClient = OkHttpClient()
         val baseUrl = "https://pokeapi.co/api/v2"
         val cl = Client(baseUrl, baseHTTPClient)
-        println(cl.getEvolutionChain(2))
+//        println(cl.getEvolutionChain(2))
+        println(cl.makeRequest<EvolutionChainResponse>("https://pokeapi.co/api/v2/evolution-chain/2/"))
     }
 
     @Test
