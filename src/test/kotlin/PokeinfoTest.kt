@@ -13,6 +13,15 @@ class PokeinfoTest {
         val baseUrl = "https://pokeapi.co/api/v2"
         return Pokeinfo(Client(baseUrl, baseHTTPClient))
     }
+
+    @Test
+    fun foo() {
+        val baseHTTPClient = OkHttpClient()
+        val baseUrl = "https://pokeapi.co/api/v2"
+        val cl = Client(baseUrl, baseHTTPClient)
+        println(cl.getEvolutionChain(2))
+    }
+
     @Test
     fun testGetMove() {
         val baseHTTPClient = OkHttpClient()
@@ -20,8 +29,6 @@ class PokeinfoTest {
         val cl = Client(baseUrl, baseHTTPClient)
         val pokeinfo = Pokeinfo(Client(baseUrl, baseHTTPClient))
         println(pokeinfo.getMove("headbutt").Data().toString())
-//        println(pokeinfo.getMove("bullet-punch").Data().toString())
-//        assertEquals(1,2)
     }
 
     @Test
