@@ -1,6 +1,5 @@
 package org.gabrielross
 
-import kotlinx.serialization.Serializable
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import okhttp3.OkHttpClient
@@ -8,7 +7,7 @@ import org.gabrielross.api.Pokeinfo
 import org.gabrielross.client.Client
 import org.slf4j.LoggerFactory
 
-object PokeInfo : ModInitializer {
+object PokeinfoMod : ModInitializer {
     private val logger = LoggerFactory.getLogger("pokeinfo")
 
 
