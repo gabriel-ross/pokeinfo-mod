@@ -1,11 +1,9 @@
 import okhttp3.OkHttpClient
-import org.gabrielross.api.Pokeinfo
+import org.gabrielross.pokeinfo.Pokeinfo
 import org.gabrielross.client.Client
-import org.gabrielross.client.response.EvolutionChainResponse
+import org.gabrielross.client.model.EvolutionChainResponse
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import kotlin.random.Random
-import kotlin.random.nextInt
 import kotlin.test.assertContains
 
 class PokeinfoTest {

@@ -1,20 +1,22 @@
-package org.gabrielross.api
+package org.gabrielross.pokeinfo
 
 import org.gabrielross.client.Client
-import org.gabrielross.client.response.EvolutionChainResponse
-import org.gabrielross.client.response.EvolvesTo
+import org.gabrielross.client.model.EvolutionChainResponse
+import org.gabrielross.client.model.EvolvesTo
 import org.gabrielross.constants.EggGroup
 import org.gabrielross.constants.MoveLearnMethod
 import org.gabrielross.model.Ability
 import org.gabrielross.model.Move
-import org.gabrielross.model.Pokemon
+import org.gabrielross.model.Pokemon as PokemonModel
 import org.gabrielross.model.SpeciesData
 import java.io.IOException
 import kotlin.text.replace
 
-class Pokeinfo(
-    val apiClient: Client
-) {
+class Pokeinfo(val client: Client) {
+    val pokemon: Pokemon = Pokemon(client)
+    val ability: Ability = Ability(client)
+    val move: Move = Move(client)
+    val search: Search = Search(client)
 
     fun calculateCandies(pokemonIdentifier: String, startLevel: Int, targetLevel: Int, candyInventory: CandyInventory = CandyInventory.max()): CandyCalculatorResponse {
         // Fetch pokemon growthrate from pokemon-species endpoint, then
@@ -34,28 +36,6 @@ class Pokeinfo(
         return ExperienceCalculator.calculateCandies(target.experience - start.experience, candyInventory)
     }
 
-    // Get pokemon data. If fetching fails for the given identifier will attempt
-    // to retrieve id from the /pokemon-species endpoint and then re-attempt to
-    // fetch pokemon data using id.
-    fun getPokemon(identifier: String): Pokemon {
-        return try {
-            Pokemon.fromResponse(this.apiClient.getPokemon(identifier))
-        } catch (e: IOException) {
-            Pokemon.fromResponse(this.apiClient.getPokemon(this.apiClient.getPokemonSpecies(identifier).id.toString()))
-        }
-    }
-
-    fun getPokemonSpecies(identifier: String): SpeciesData {
-        return SpeciesData.fromResponse(this.apiClient.getPokemonSpecies(identifier))
-    }
-
-    fun getMove(identifier: String): Move {
-        return Move.fromResponse(this.apiClient.getMove(identifier))
-    }
-
-    fun getAbility(identifier: String): Ability {
-        return Ability.FromResponse(this.apiClient.getAbility(identifier))
-    }
 
     fun getAbilityLearnset(name: String, onlyFullyEvolved: Boolean = false): List<String> {
         if (onlyFullyEvolved) {
@@ -64,31 +44,6 @@ class Pokeinfo(
         return abilityLearnset(name).toList()
     }
 
-    fun getAbilityAndMoveLearnset(ability: String, moves: String, onlyFullyEvolved: Boolean = false): List<String> {
-        return getAbilityAndMoveLearnset(ability, cleanPotentialListInput(moves).split(","), onlyFullyEvolved)
-    }
-
-    // Lookup pokemon that have access to ability and learn the provided moves.
-    fun getAbilityAndMoveLearnset(ability: String, moves: List<String>, onlyFullyEvolved: Boolean = false): List<String> {
-        if (ability.isEmpty() || moves.isEmpty()) {
-            return emptyList()
-        }
-        var learnset = abilityLearnset(ability)
-        moves.forEach { mv ->
-            var intersects = mutableSetOf<String>()
-            this.apiClient.getMove(cleanNameInput(mv)).learned_by_pokemon.forEach { pk ->
-                if (learnset.contains(pk.name)) {
-                    intersects.add(pk.name)
-                }
-            }
-            learnset = intersects
-        }
-
-        if (onlyFullyEvolved) {
-            return learnset.filter { it -> isFullyEvolved(it) }
-        }
-        return learnset.toList()
-    }
 
 
     // Returns the methods by which a pokemon can learn a move. Moves that are
@@ -204,68 +159,6 @@ class Pokeinfo(
         return learnset.toList()
     }
 
-    // Return whether a pokemon is fully evolved
-    fun isFullyEvolved(pokemon: String): Boolean {
-        var queue = mutableListOf<EvolvesTo>()
-        queue.add(this.apiClient.makeRequest<EvolutionChainResponse>(this.apiClient.getPokemonSpecies(pokemon).evolution_chain.url).chain)
-        while (!queue.isEmpty()) {
-            val cur = queue.removeFirst()
-            if (cur.species.name == pokemon && cur.evolves_to.isEmpty()) {
-                return true
-            } else if (cur.species.name == pokemon && !cur.evolves_to.isEmpty()) {
-                return false
-            }
-            queue.addAll(cur.evolves_to)
-        }
-        return false
-    }
-
-    // Get all pokemon that share an egg group with a given pokemon.
-    fun getBreedablePokemon(pokemonIdentifier: String): List<String> {
-        var pokemon = mutableSetOf<String>()
-        val speciesResp = this.apiClient.getPokemonSpecies(pokemonIdentifier).egg_groups.forEach { it ->
-            this.apiClient.getEggGroup(it.name.toString()).pokemon_species.forEach { pk ->
-                pokemon.add(pk.name)
-            }
-        }
-
-        return pokemon.toList()
-    }
-
-    // Checks whether two pokemon share an egg group. Returns false if either
-    // of the pokemon belong to any of the following egg groups:
-    // - NoEggs/NoEggsDiscovered
-    // - Indeterminate
-    //
-    // Returns true if either of the pokemon are ditto or if they share any
-    // egg groups.
-    fun canBreed(pkIdentifier1: String, pkIdentifier2: String): Boolean {
-        val dittoName = "ditto"
-        val dittoId = "132"
-        if (pkIdentifier1 == dittoName ||
-            pkIdentifier1 == dittoId ||
-            pkIdentifier2 == dittoName ||
-            pkIdentifier2 == dittoId) {
-            return true
-        }
-        val pk1 = this.apiClient.getPokemonSpecies(pkIdentifier1)
-        val pk2 = this.apiClient.getPokemonSpecies(pkIdentifier2)
-        pk1.egg_groups.forEach { eg1 ->
-            pk2.egg_groups.forEach { eg2 ->
-                // Return true if either pokemon is ditto
-                if (eg1.name == EggGroup.NoEggs ||
-                    eg2.name == EggGroup.NoEggs ||
-                    eg1.name == EggGroup.Indeterminate ||
-                    eg2.name == EggGroup.Indeterminate) {
-                    return false
-                } else if (eg1.name == eg2.name) {
-                    return true
-                }
-            }
-        }
-
-        return false
-    }
 
     fun natureDoes(identifier: String): String {
         val nature = this.apiClient.getNature(identifier)
@@ -292,16 +185,6 @@ class Pokeinfo(
         return learnset
     }
 
-    // Helper methods for standardizing argument inputs
-    companion object {
-
-        private fun cleanPotentialListInput(inp: String): String {
-            return inp.filterNot{c -> c == '[' || c == ']'}
-        }
-        private fun cleanNameInput(inp: String): String {
-            return inp.trim().replace("_", "-").replace(" ", "-")
-        }
-    }
 }
 
 data class LearnableMove(

@@ -1,64 +1,15 @@
 package org.gabrielross.model
 
-import org.gabrielross.client.response.PokemonResponse
-import org.gabrielross.client.response.SpeciesResponse
+import org.gabrielross.client.model.PokemonResponse
+import org.gabrielross.client.model.SpeciesResponse
 import org.gabrielross.constants.EggGroup
 import org.gabrielross.constants.GrowthRate
 import org.gabrielross.constants.MoveLearnMethod
 import org.gabrielross.constants.Type
 
-data class SpeciesData(
-    val id: Int,
-    val name: String,
-    val captureRate: Int,
-    val eggGroup1: EggGroup,
-    val eggGroup2: EggGroup?,
-    val growthRate: GrowthRate,
-) {
-    companion object {
-        fun fromResponse(data: SpeciesResponse): SpeciesData {
-            val primaryEggGroup = data.egg_groups[0].name
-            var secondaryEggGroup: EggGroup? = null
-            if (data.egg_groups.size > 1) {
-                secondaryEggGroup = data.egg_groups[1].name
-            }
-            return SpeciesData(
-                id = data.id,
-                name = data.name,
-                captureRate = data.capture_rate,
-                eggGroup1 = primaryEggGroup,
-                eggGroup2 = secondaryEggGroup,
-                growthRate = data.growth_rate.name
-            )
-        }
-    }
-}
-
 
 // Contains data for a pokemon object
-data class PokemonData(
-    val id: Int,
-    val name: String,
-    val baseStats: Stats,
-    val abilities: List<PokemonAbilityData> = emptyList<PokemonAbilityData>(),
-    val moves: List<PokemonMoveData> = emptyList<PokemonMoveData>(),
-    val evYield: Stats = Stats(),
-    val type1: Type,
-    val type2: Type?,
-    val speciesData: SpeciesData?
-)
-
-data class PokemonAbilityData(
-    val name: String,
-    val isHidden: Boolean
-)
-
-data class PokemonMoveData(
-    val name: String,
-    val learnMethod: MoveLearnMethod
-)
-
-class Pokemon(
+data class Pokemon(
     val id: Int,
     val name: String,
     val baseStats: Stats,
@@ -67,12 +18,10 @@ class Pokemon(
     val evYield: Stats = Stats(),
     val type1: Type,
     val type2: Type?,
-    val speciesData: SpeciesData?
+    val speciesData: Species?
 ) {
     companion object {
-        // Creates a Pokemon object from a PokemonResponse object containing data
-        // from an API response for pokemon
-        fun fromResponse(data: PokemonResponse): Pokemon {
+        fun fromResponseData(data: PokemonResponse): Pokemon {
             var abilities = mutableListOf<PokemonAbility>()
             data.abilities.forEach { ability ->
                 abilities.add(PokemonAbility(ability.ability.name, ability.is_hidden))
@@ -134,56 +83,48 @@ class Pokemon(
                 moves = emptyList<PokemonMove>(),
                 type1 = type1,
                 type2 = type2,
-                // todo: fix this later
                 speciesData = null
             )
         }
     }
+}
 
-
-    fun Data(): PokemonData {
-        var abilities = mutableListOf<PokemonAbilityData>()
-        this.abilities.forEach { ability ->
-            abilities.add(ability.Data())
+data class Species(
+    val id: Int,
+    val name: String,
+    val captureRate: Int,
+    val eggGroup1: EggGroup,
+    val eggGroup2: EggGroup?,
+    val growthRate: GrowthRate,
+) {
+    companion object {
+        fun fromResponse(data: SpeciesResponse): Species {
+            val primaryEggGroup = data.egg_groups[0].name
+            var secondaryEggGroup: EggGroup? = null
+            if (data.egg_groups.size > 1) {
+                secondaryEggGroup = data.egg_groups[1].name
+            }
+            return Species(
+                id = data.id,
+                name = data.name,
+                captureRate = data.capture_rate,
+                eggGroup1 = primaryEggGroup,
+                eggGroup2 = secondaryEggGroup,
+                growthRate = data.growth_rate.name
+            )
         }
-        var moves = mutableListOf<PokemonMoveData>()
-        this.moves.forEach { move ->
-            moves.add(move.Data())
-        }
-        return PokemonData(
-            id = this.id,
-            name = this.name,
-            baseStats = this.baseStats,
-            abilities = abilities,
-            moves = moves,
-            evYield = this.evYield,
-            type1 = this.type1,
-            type2 = this.type2,
-            speciesData = null
-        )
     }
 }
 
-class PokemonAbility(
+
+data class PokemonAbility(
     val name: String,
     val isHidden: Boolean
-) {
-    fun Data(): PokemonAbilityData {
-        return PokemonAbilityData(
-            name = this.name,
-            isHidden = this.isHidden
-        )
-    }
-}
+)
 
-class PokemonMove(
+data class PokemonMove(
     val name: String,
     val learnMethod: MoveLearnMethod
-) {
-    fun Data(): PokemonMoveData {
-        return PokemonMoveData(
-            name = this.name,
-            learnMethod = this.learnMethod
-        )
-    }
-}
+)
+
+

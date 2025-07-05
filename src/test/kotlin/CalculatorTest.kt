@@ -1,7 +1,3 @@
-import okhttp3.Request
-import org.gabrielross.api.CandyInventory
-import org.gabrielross.api.ExperienceCalculator
-import org.gabrielross.constants.GrowthRate
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 

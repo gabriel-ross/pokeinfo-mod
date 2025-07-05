@@ -1,13 +1,12 @@
 package org.gabrielross.model
 
-import org.gabrielross.client.response.MoveResponse
+import org.gabrielross.client.model.MoveResponse
 import org.gabrielross.constants.DamageClass
 import org.gabrielross.constants.Language
 import org.gabrielross.constants.Type
-import kotlin.Int
 
 // Contains data for a move object
-data class MoveData(
+data class Move(
     val id: Int,
     val name: String,
     val priority: Int,
@@ -19,25 +18,8 @@ data class MoveData(
     val shortEffect: String,
     val longEffect: String
 ) {
-    override fun toString(): String {
-        return "id: ${this.id}\nname: ${this.name}\npriority: ${this.priority}\naccuracy: ${this.accuracy}\npower: ${this.power}\npp: ${this.pp}\ndamageClass: ${this.damageClass}\ntype: ${this.type}\neffect: ${this.shortEffect}\n"
-    }
-}
-
-class Move(
-    val id: Int,
-    val name: String,
-    val priority: Int,
-    val accuracy: Int?,
-    val power: Int?,
-    val pp: Int,
-    val type: Type,
-    val damageClass: DamageClass,
-    val longEffect: String,
-    val shortEffect: String
-) {
     companion object {
-        fun fromResponse(data: MoveResponse): Move {
+        fun fromResponseData(data: MoveResponse): Move {
             var longEffect = ""
             var shortEffect = ""
             data.effect_entries.forEach { effectEntry ->
@@ -59,19 +41,10 @@ class Move(
                 shortEffect = shortEffect
             )
         }
-    }
-    fun Data(): MoveData {
-        return MoveData(
-            id = this.id,
-            name = this.name,
-            priority = this.priority,
-            accuracy = this.accuracy,
-            power = this.power,
-            pp = this.pp,
-            type = this.type,
-            damageClass = this.damageClass,
-            longEffect = this.longEffect,
-            shortEffect = this.shortEffect
-        )
+}
+    override fun toString(): String {
+        return "id: ${this.id}\nname: ${this.name}\npriority: ${this.priority}\naccuracy: ${this.accuracy}\npower: ${this.power}\npp: ${this.pp}\ndamageClass: ${this.damageClass}\ntype: ${this.type}\neffect: ${this.shortEffect}\n"
     }
 }
+
+

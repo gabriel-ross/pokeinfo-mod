@@ -6,12 +6,10 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType.getString
 import com.mojang.brigadier.arguments.StringArgumentType.greedyString
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import com.sun.jdi.connect.Connector
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
 import net.minecraft.network.chat.Component
-import org.gabrielross.PokemonCommand.Companion.searchByAbilityMove
-import org.gabrielross.api.Pokeinfo
+import org.gabrielross.pokeinfo.Pokeinfo
 import org.gabrielross.constants.Nature
 
 

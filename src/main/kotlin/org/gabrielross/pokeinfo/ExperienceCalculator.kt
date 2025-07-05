@@ -1,4 +1,4 @@
-package org.gabrielross.api
+package org.gabrielross.pokeinfo
 
 import org.gabrielross.client.Client
 import org.gabrielross.constants.GrowthRate

@@ -1,14 +1,19 @@
 package org.gabrielross.client
 
+import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.ResponseBody
 import org.gabrielross.client.model.*
 import org.gabrielross.constants.Type
-import org.gabrielross.constants.UnmarshalStrategy
 import java.io.IOException
 
-open class Client constructor(
+val UnmarshalStrategy = Json {
+    ignoreUnknownKeys = true
+    decodeEnumsCaseInsensitive = true
+}
+
+class Client constructor(
     baseUrl: String,
     httpClient: OkHttpClient
 ) {

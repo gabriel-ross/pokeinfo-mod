@@ -3,7 +3,7 @@ package org.gabrielross
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import okhttp3.OkHttpClient
-import org.gabrielross.api.Pokeinfo
+import org.gabrielross.pokeinfo.Pokeinfo
 import org.gabrielross.client.Client
 import org.slf4j.LoggerFactory
 
