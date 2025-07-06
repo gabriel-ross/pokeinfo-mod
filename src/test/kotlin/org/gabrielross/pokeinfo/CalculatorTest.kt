@@ -1,9 +1,12 @@
+package org.gabrielross.pokeinfo
+
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class CalculatorTest {
 
-    @Test fun demo() {
+    @Test
+    fun demo() {
         assertEquals(1, 1)
     }
 //

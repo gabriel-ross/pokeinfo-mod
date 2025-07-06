@@ -1,8 +1,8 @@
 package org.gabrielross.constants
 
 enum class NatureModifier(val value: Double) {
-    Increasing(1.1),
-    Decreasing(.9),
+    Increased(1.1),
+    Decreased(.9),
     Neutral(1.0)
 }
 
