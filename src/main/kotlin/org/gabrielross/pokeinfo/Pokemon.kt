@@ -4,6 +4,7 @@ import org.gabrielross.client.Client
 import org.gabrielross.client.model.EvolutionChainResponse
 import org.gabrielross.client.model.EvolvesTo
 import org.gabrielross.constants.EggGroup
+import org.gabrielross.constants.MoveLearnMethod
 import org.gabrielross.model.Species
 import java.io.IOException
 import org.gabrielross.model.Pokemon as PokemonModel
@@ -23,34 +24,55 @@ class Pokemon(val client: Client) {
         }
     }
 
-//    fun search(abilityIdentifier: String, moves: String, onlyFullyEvolved: Boolean = false): List<String> {
-//        return search(abilityIdentifier, cleanPotentialListInput(moves).split(","), onlyFullyEvolved)
-//    }
-//
-//    // Lookup pokemon that have access to ability and learn the provided moves.
-//    fun search(abilityIdentifier: String, moves: List<String>, onlyFullyEvolved: Boolean = false): List<String> {
-//        if (abilityIdentifier.isEmpty() || moves.isEmpty()) {
-//            return emptyList()
-//        }
-//        var learnset = abilityLearnset(ability)
-//        moves.forEach { mv ->
-//            var intersects = mutableSetOf<String>()
-//            client.getMove(Pokeinfo.Companion.cleanNameInput(mv)).learned_by_pokemon.forEach { pk ->
-//                if (learnset.contains(pk.name)) {
-//                    intersects.add(pk.name)
-//                }
-//            }
-//            learnset = intersects
-//        }
-//
-//        if (onlyFullyEvolved) {
-//            return learnset.filter { it -> isFullyEvolved(it) }
-//        }
-//        return learnset.toList()
-//    }
-
     fun getSpecies(identifier: String): Species {
         return Species.fromResponse(client.getPokemonSpecies(identifier))
+    }
+
+    // Returns the methods by which a pokemon can learn a move. Moves that are
+    // learned upon evolution will be listed as LevelUp moves learned at level 0.
+    //
+    // when a Pokemon that learn a move by both evolution and level-up the
+    // response.levelLearnedAt field set to the latest level at which they
+    // learn the move.
+    //
+    // When the includePriorEvos flag is enabled this method will also
+    // search the movesets of prior evolutions and results will include
+    // moves that are potentially only learnable by a prior evolution
+    // (spore on breloom for example).
+    //
+    // Note: Searching prior evolutions is a relatively expensive operation.
+    fun learnsMove(
+        pokemonIdentifier: String,
+        moveIdentifier: String,
+        includePriorEvos: Boolean = false,
+        onlyIncludeLatestVersion: Boolean = true
+    ): LearnableMove {
+        // todo: should check if pokemon is baby and skip searching prior evos
+        var canLearnMove = LearnableMove(pokemonIdentifier, moveIdentifier, false, null)
+        var moves = client.getPokemon(pokemonIdentifier)
+        var moveEntries = moves.moves.find { it.move.name == moveIdentifier }
+
+        if (moveEntries != null) {
+            canLearnMove.canLearnMove = true
+            moveEntries.version_group_details.forEach { it ->
+                if (it.move_learn_method.name == MoveLearnMethod.LevelUp) {
+                    if (canLearnMove.levelLearnedAt == 0) {
+                        canLearnMove.learnsByEvolution = true
+                    } else {
+                        canLearnMove.learnsByLevelUp = true
+                    }
+                    canLearnMove.levelLearnedAt = it.level_learned_at
+                } else if (it.move_learn_method.name == MoveLearnMethod.Machine) {
+                    canLearnMove.learnsByMachine = true
+                } else if (it.move_learn_method.name == MoveLearnMethod.Egg) {
+                    canLearnMove.learnsByBreeding = true
+                }
+            }
+        } else if (includePriorEvos) {
+            // todo: check prior evo moves (including egg moves)
+        }
+
+        return canLearnMove
     }
 
 
@@ -73,7 +95,7 @@ class Pokemon(val client: Client) {
     // Get all pokemon that share an egg group with a given pokemon.
     fun allBreedsWith(pokemonIdentifier: String): List<String> {
         var pokemon = mutableSetOf<String>()
-        val speciesResp = client.getPokemonSpecies(pokemonIdentifier).egg_groups.forEach { it ->
+        client.getPokemonSpecies(pokemonIdentifier).egg_groups.forEach { it ->
             client.getEggGroup(it.name.toString()).pokemon_species.forEach { pk ->
                 pokemon.add(pk.name)
             }
@@ -117,3 +139,17 @@ class Pokemon(val client: Client) {
         return false
     }
 }
+
+
+data class LearnableMove(
+    val pokemon: String,
+    val move: String,
+    var canLearnMove: Boolean,
+    var levelLearnedAt: Int?,
+    var learnsByLevelUp: Boolean = false,
+    var learnsByEvolution: Boolean = false,
+    var learnsByMachine: Boolean = false,
+    var learnsByBreeding: Boolean = false,
+    var learnsByPriorEvolution: Boolean = false,
+    var priorEvoLearnMethod: LearnableMove? = null
+)

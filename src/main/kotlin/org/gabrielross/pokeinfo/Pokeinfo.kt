@@ -5,10 +5,9 @@ import org.gabrielross.client.model.EvolutionChainResponse
 import org.gabrielross.client.model.EvolvesTo
 import org.gabrielross.constants.EggGroup
 import org.gabrielross.constants.MoveLearnMethod
-import org.gabrielross.model.Ability
-import org.gabrielross.model.Move
+import org.gabrielross.constants.NatureModifier
 import org.gabrielross.model.Pokemon as PokemonModel
-import org.gabrielross.model.SpeciesData
+import org.gabrielross.model.Species
 import java.io.IOException
 import kotlin.text.replace
 
@@ -18,184 +17,35 @@ class Pokeinfo(val client: Client) {
     val move: Move = Move(client)
     val search: Search = Search(client)
 
-    fun calculateCandies(pokemonIdentifier: String, startLevel: Int, targetLevel: Int, candyInventory: CandyInventory = CandyInventory.max()): CandyCalculatorResponse {
-        // Fetch pokemon growthrate from pokemon-species endpoint, then
-        // fetch growth rate level data from growth-rate endpoint.
-        val growthRateData = this.apiClient.getGrowthRate(this.apiClient.getPokemonSpecies(pokemonIdentifier).growth_rate.toString())
-        var start = growthRateData.levels[startLevel-1]
-        var target = growthRateData.levels[targetLevel-1]
+//    fun calculateCandies(pokemonIdentifier: String, startLevel: Int, targetLevel: Int, candyInventory: CandyInventory = CandyInventory.max()): CandyCalculatorResponse {
+//        // Fetch pokemon growthrate from pokemon-species endpoint, then
+//        // fetch growth rate level data from growth-rate endpoint.
+//        val growthRateData = this.apiClient.getGrowthRate(this.apiClient.getPokemonSpecies(pokemonIdentifier).growth_rate.toString())
+//        var start = growthRateData.levels[startLevel-1]
+//        var target = growthRateData.levels[targetLevel-1]
+//
+//        // Search for level data if levels list is not ordered.
+//        if (start.level != startLevel) {
+//            start = growthRateData.levels.find { levelEntry -> levelEntry.level == startLevel }!!
+//        }
+//        if (target.level != targetLevel) {
+//            target = growthRateData.levels.find { levelEntry -> levelEntry.level == targetLevel }!!
+//        }
+//
+//        return ExperienceCalculator.calculateCandies(target.experience - start.experience, candyInventory)
+//    }
 
-        // Search for level data if levels list is not ordered.
-        if (start.level != startLevel) {
-            start = growthRateData.levels.find { levelEntry -> levelEntry.level == startLevel }!!
-        }
-        if (target.level != targetLevel) {
-            target = growthRateData.levels.find { levelEntry -> levelEntry.level == targetLevel }!!
-        }
-
-        return ExperienceCalculator.calculateCandies(target.experience - start.experience, candyInventory)
+    fun calculateHP(base: Int, iv: Int, ev: Int, level: Int): Int {
+        return (((2 * base + iv + (ev/4)) * level) / 100) + level + 10
     }
 
-
-    fun getAbilityLearnset(name: String, onlyFullyEvolved: Boolean = false): List<String> {
-        if (onlyFullyEvolved) {
-            return abilityLearnset(name).filter { it -> isFullyEvolved(it) }
-        }
-        return abilityLearnset(name).toList()
+    fun calculateStat(base: Int, iv: Int, ev: Int, level: Int, nature: NatureModifier): Int {
+        return (((((2 * base + iv + (ev/4)) * level) / 100) + 5) * nature.value).toInt()
     }
-
-
-
-    // Returns the methods by which a pokemon can learn a move. Moves that are
-    // learned upon evolution will be listed as LevelUp moves learned at level 0.
-    //
-    // when a Pokemon that learn a move by both evolution and level-up the
-    // response.levelLearnedAt field set to the latest level at which they
-    // learn the move.
-    //
-    // When the includePriorEvos flag is enabled this method will also
-    // search the movesets of prior evolutions and results will include
-    // moves that are potentially only learnable by a prior evolution
-    // (spore on breloom for example).
-    //
-    // Note: Searching prior evolutions is a relatively expensive operation.
-    fun pokemonLearnsMove(
-        pokemonIdentifier: String,
-        moveIdentifier: String,
-        includePriorEvos: Boolean = false,
-        onlyIncludeLatestVersion: Boolean = true
-    ): LearnableMove {
-        // todo: should check if pokemon is baby and skip searching prior evos
-        var canLearnMove = LearnableMove(pokemonIdentifier, moveIdentifier, false, null)
-        var moves = this.apiClient.getPokemon(pokemonIdentifier)
-        var moveEntries = moves.moves.find { it.move.name == moveIdentifier }
-
-        if (moveEntries != null) {
-            canLearnMove.canLearnMove = true
-            moveEntries.version_group_details.forEach { it ->
-                if (it.move_learn_method.name == MoveLearnMethod.LevelUp) {
-                    if (canLearnMove.levelLearnedAt == 0) {
-                        canLearnMove.learnsByEvolution = true
-                    } else {
-                        canLearnMove.learnsByLevelUp = true
-                    }
-                    canLearnMove.levelLearnedAt = it.level_learned_at
-                } else if (it.move_learn_method.name == MoveLearnMethod.Machine) {
-                    canLearnMove.learnsByMachine = true
-                } else if (it.move_learn_method.name == MoveLearnMethod.Egg) {
-                    canLearnMove.learnsByBreeding = true
-                }
-            }
-        } else if (includePriorEvos) {
-            // todo: check prior evo moves (including egg moves)
-        }
-
-        return canLearnMove
-    }
-
-    // Get the names of pokemon that learn a move
-    fun getMoveLearnset(names: String, onlyFullyEvolved: Boolean = false): List<String> {
-        return getMoveLearnset(cleanPotentialListInput(names).split(","), onlyFullyEvolved)
-    }
-
-    // Get the names of pokemon that learn all listed moves
-    fun getMoveLearnset(names: List<String>, onlyFullyEvolved: Boolean = false): List<String> {
-        if (names.isEmpty()) {
-            return emptyList()
-        }
-
-        var resp = this.apiClient.getMove(cleanNameInput(names[0]))
-        var learnsetIntersects = mutableSetOf<String>()
-
-        // Initialize learnset
-        resp.learned_by_pokemon.forEach { pokemon ->
-            // Filter megas & gmax pokemon as they have the same learnset as base
-            if (pokemon.name.contains("-mega") || pokemon.name.contains("-gmax")) return@forEach
-            learnsetIntersects.add(pokemon.name)
-        }
-
-        if (names.size == 1) {
-            return learnsetIntersects.toList()
-        }
-
-        names.drop(1).forEach { moveName ->
-            var learnset = mutableSetOf<String>()
-            resp = this.apiClient.getMove(cleanNameInput(moveName))
-            resp.learned_by_pokemon.forEach { pokemon ->
-                if (learnsetIntersects.contains(pokemon.name)) {
-                    learnset.add(pokemon.name)
-                }
-            }
-            learnsetIntersects = learnset
-        }
-
-        if (onlyFullyEvolved) {
-            return learnsetIntersects.filter { it -> isFullyEvolved(it) }
-        }
-        return learnsetIntersects.toList()
-    }
-
-
-    // Get the pokemon that learn any of the listed moves
-    fun getMoveLearnsetUnion(names: String, onlyFullyEvolved: Boolean = false): List<String> {
-        return getMoveLearnsetUnion(cleanPotentialListInput(names).split(","), onlyFullyEvolved)
-    }
-
-    // Get the pokemon that learn any of the listed moves
-    fun getMoveLearnsetUnion(names: List<String>, onlyFullyEvolved: Boolean = false): List<String> {
-        var learnset = mutableSetOf<String>()
-        names.forEach { name ->
-            val resp = this.apiClient.getMove(name)
-            resp.learned_by_pokemon.forEach { pokemon ->
-                // Filter megas & gmax pokemon as they have the same learnset as base
-                if (pokemon.name.contains("-mega") || pokemon.name.contains("-gmax")) return@forEach
-
-                learnset.add(pokemon.name)
-            }
-        }
-        if (onlyFullyEvolved) {
-            return learnset.filter { it -> isFullyEvolved(it) }
-        }
-        return learnset.toList()
-    }
-
 
     fun natureDoes(identifier: String): String {
-        val nature = this.apiClient.getNature(identifier)
+        val nature = client.getNature(identifier)
         return "$identifier: +${nature.increased_stat.name} -${nature.decreased_stat.name}"
     }
 
-    // Helper function for fetching an ability's learnset
-    private fun abilityLearnset(identifier: String): MutableSet<String> {
-        var learnset = mutableSetOf<String>()
-        this.apiClient.getAbility(cleanNameInput(identifier)).pokemon.forEach { it ->
-            if (it.pokemon.name.contains("-gmax")) return@forEach
-            learnset.add(it.pokemon.name)
-        }
-        return learnset
-    }
-
-    // Helper function for fetching a moves's learnset
-    private fun moveLearnset(identifier: String): MutableSet<String> {
-        var learnset = mutableSetOf<String>()
-        this.apiClient.getMove(cleanNameInput(identifier)).learned_by_pokemon.forEach { it ->
-            if (it.name.contains("-mega") || it.name.contains("-gmax")) return@forEach
-            learnset.add(it.name)
-        }
-        return learnset
-    }
-
 }
-
-data class LearnableMove(
-    val pokemon: String,
-    val move: String,
-    var canLearnMove: Boolean,
-    var levelLearnedAt: Int?,
-    var learnsByLevelUp: Boolean = false,
-    var learnsByEvolution: Boolean = false,
-    var learnsByMachine: Boolean = false,
-    var learnsByBreeding: Boolean = false,
-    var learnsByPriorEvolution: Boolean = false,
-    var priorEvoLearnMethod: LearnableMove? = null
-)
