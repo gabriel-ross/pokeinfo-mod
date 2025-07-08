@@ -2,6 +2,7 @@ package org.gabrielross.pokeinfo
 
 import org.gabrielross.client.Client
 import org.gabrielross.client.model.PokemonResponse
+import org.gabrielross.constants.Type
 
 class filters(
     includeGmax: Boolean = false,
@@ -16,17 +17,21 @@ class filters(
 class Search(val client: Client) {
     val pokemon: Pokemon = Pokemon(client)
 
-    fun pokemon(ability: String, moves: String, filters: filters = filters()): List<String> {
-        return pokemon(ability, cleanPotentialListInput(moves).split(","), filters)
+    fun pokemon(type: Type? = null, ability: String, moves: String, filters: filters = filters()): List<String> {
+        return pokemon(type, ability, cleanPotentialListInput(moves).split(","), filters)
     }
 
-    fun pokemon(ability: String, moves: List<String>, filters: filters = filters()): List<String> {
+    fun pokemon(type: Type? = null, ability: String, moves: List<String>, filters: filters = filters()): List<String> {
         if (ability.isEmpty() || moves.isEmpty()) {
             return emptyList()
         }
         var learnset = fetchFilteredAbilitySet(ability, filters)
         moves.forEach { it ->
             learnset = learnset.intersect(fetchFilteredLearnset(it, filters))
+        }
+
+        if (type != null) {
+            learnset = learnset.intersect(fetchFilteredTypeSet(type, filters))
         }
 
         return learnset.toList()
@@ -75,6 +80,29 @@ class Search(val client: Client) {
         }
 
         return learnset.toList()
+    }
+
+    private fun fetchFilteredTypeSet(
+        identifer: Type,
+        filters: filters = filters(
+            includeMega = false,
+            includeGmax = false
+        )): Set<String> {
+        var typeset = mutableSetOf<String>()
+        client.getType(identifer).pokemon.forEach { it ->
+            when {
+                it.pokemon.name.contains("-gmax") && filters.includeGmax -> typeset.add(it.pokemon.name)
+                it.pokemon.name.contains("-mega") && filters.includeMega -> typeset.add(it.pokemon.name)
+                filters.includeNFE -> typeset.add(it.pokemon.name)
+                else -> {
+                    val species = client.makeRequest<PokemonResponse>(it.pokemon.url).species.name
+                    if (pokemon.isFullyEvolved(species)) {
+                        typeset.add(it.pokemon.name)
+                    }
+                }
+            }
+        }
+        return typeset
     }
 
     private fun fetchFilteredAbilitySet(

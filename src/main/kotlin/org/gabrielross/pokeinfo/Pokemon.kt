@@ -76,15 +76,26 @@ class Pokemon(val client: Client) {
     }
 
 
-    // Return whether a pokemon is fully evolved
-    fun isFullyEvolved(pokemon: String): Boolean {
+    // Return whether a pokemon is fully evolved.
+    //
+    // If client fails to fetch an evolution chain for the given identifier,
+    // which may happen if identifier is an integer id or the name of a
+    // pokemon's form, then it will attempt to fetch species name from the /pokemon endpoint.
+    fun isFullyEvolved(identifier: String): Boolean {
+        var name = identifier
         var queue = mutableListOf<EvolvesTo>()
-        queue.add(client.makeRequest<EvolutionChainResponse>(client.getPokemonSpecies(pokemon).evolution_chain.url).chain)
+        try {
+            queue.add(client.makeRequest<EvolutionChainResponse>(client.getPokemonSpecies(name).evolution_chain.url).chain)
+        } catch (e: IOException) {
+            name = client.getPokemon(identifier).species.name
+            queue.add(client.makeRequest<EvolutionChainResponse>(client.getPokemonSpecies(name).evolution_chain.url).chain)
+        }
+
         while (!queue.isEmpty()) {
             val cur = queue.removeFirst()
-            if (cur.species.name == pokemon && cur.evolves_to.isEmpty()) {
+            if (cur.species.name == name && cur.evolves_to.isEmpty()) {
                 return true
-            } else if (cur.species.name == pokemon && !cur.evolves_to.isEmpty()) {
+            } else if (cur.species.name == name && !cur.evolves_to.isEmpty()) {
                 return false
             }
             queue.addAll(cur.evolves_to)

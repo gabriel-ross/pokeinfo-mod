@@ -16,6 +16,7 @@ class Pokeinfo(val client: Client) {
     val ability: Ability = Ability(client)
     val move: Move = Move(client)
     val search: Search = Search(client)
+    val calculate: Calculator(client)
 
 //    fun calculateCandies(pokemonIdentifier: String, startLevel: Int, targetLevel: Int, candyInventory: CandyInventory = CandyInventory.max()): CandyCalculatorResponse {
 //        // Fetch pokemon growthrate from pokemon-species endpoint, then
@@ -34,14 +35,6 @@ class Pokeinfo(val client: Client) {
 //
 //        return ExperienceCalculator.calculateCandies(target.experience - start.experience, candyInventory)
 //    }
-
-    fun calculateHP(base: Int, iv: Int, ev: Int, level: Int): Int {
-        return (((2 * base + iv + (ev/4)) * level) / 100) + level + 10
-    }
-
-    fun calculateStat(base: Int, iv: Int, ev: Int, level: Int, nature: NatureModifier): Int {
-        return (((((2 * base + iv + (ev/4)) * level) / 100) + 5) * nature.value).toInt()
-    }
 
     fun natureDoes(identifier: String): String {
         val nature = client.getNature(identifier)

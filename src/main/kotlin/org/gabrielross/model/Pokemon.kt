@@ -5,6 +5,8 @@ import org.gabrielross.client.model.SpeciesResponse
 import org.gabrielross.constants.EggGroup
 import org.gabrielross.constants.GrowthRate
 import org.gabrielross.constants.MoveLearnMethod
+import org.gabrielross.constants.NatureModifier
+import org.gabrielross.constants.Stat
 import org.gabrielross.constants.Type
 
 
@@ -116,6 +118,11 @@ data class Species(
     }
 }
 
+data class PokemonStat(
+    val name: Stat,
+    val value: Int,
+    val modifier: NatureModifier
+)
 
 data class PokemonAbility(
     val name: String,

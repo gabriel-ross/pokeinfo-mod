@@ -11,8 +11,8 @@ data class TypeResponse(
     val id: Int,
     val name: String,
     val moves: List<ShortEntry<String>>,
-    val pokemon: List<TypePokemonEntry>
+    val pokemon: List<TypeEntry>
 )
 
 @Serializable
-data class TypePokemonEntry(val pokemon: ShortEntry<String>, val slot: Int)
+data class TypeEntry(val pokemon: ShortEntry<String>, val slot: Int)

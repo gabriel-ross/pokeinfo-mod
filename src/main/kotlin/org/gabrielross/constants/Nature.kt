@@ -28,7 +28,7 @@ enum class Nature {
     bashful,
     rash,
     calm,
-    gentke,
+    gentle,
     sassy,
     careful,
     quirky

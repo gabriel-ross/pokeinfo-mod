@@ -4,38 +4,8 @@ import org.gabrielross.client.Client
 import org.gabrielross.constants.GrowthRate
 import kotlin.math.min
 
-var XL_CANDY_VALUE = 30000
-var L_CANDY_VALUE = 10000
-var M_CANDY_VALUE = 3000
-var S_CANDY_VALUE = 800
-var XS_CANDY_VALUE = 100
 
-data class CandyCalculatorResponse(
-    val inventory: CandyInventory,
-    val xpTarget: Int,
-    val xpActual: Int,
-    val surplus: Int
-)
 
-data class CandyInventory(
-    var XL: Int = 0,
-    var L: Int = 0,
-    var M: Int = 0,
-    var S: Int = 0,
-    var XS: Int = 0
-) {
-    companion object {
-        fun fromString(inp: String): CandyInventory {
-            var inv = CandyInventory()
-
-            return inv
-        }
-
-        fun max(): CandyInventory {
-            return CandyInventory(999, 999, 999, 999, 999)
-        }
-    }
-}
 
 class ExperienceCalculator() {
     companion object {
