@@ -16,14 +16,14 @@ object PokeinfoMod : ModInitializer {
         // However, some things (like resources) may still be uninitialized.
         // Proceed with mild caution.
 
-//        val baseHTTPClient = OkHttpClient()
-//        val baseUrl = "https://pokeapi.co/api/v2"
-//
-//        val pokeinfo = Pokeinfo(Client(baseUrl, baseHTTPClient))
-//
-//        CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
-//            PokemonCommand.register(dispatcher, pokeinfo)
-//        }
+        val baseHTTPClient = OkHttpClient()
+        val baseUrl = "https://pokeapi.co/api/v2"
+
+        val pokeinfo = Pokeinfo(Client(baseUrl, baseHTTPClient))
+
+        CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
+            pokeinfo.registerAllCommands(dispatcher)
+        }
 //
 //        CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
 //            MoveCommand.register(dispatcher, pokeinfo)

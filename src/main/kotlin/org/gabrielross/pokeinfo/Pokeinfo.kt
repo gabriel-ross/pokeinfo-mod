@@ -1,5 +1,15 @@
 package org.gabrielross.pokeinfo
 
+import com.mojang.brigadier.arguments.StringArgumentType.getString
+import com.mojang.brigadier.arguments.StringArgumentType.greedyString
+import com.mojang.brigadier.arguments.StringArgumentType.string
+import net.minecraft.commands.Commands.argument
+import com.mojang.brigadier.CommandDispatcher
+import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import net.minecraft.commands.CommandSourceStack
+import net.minecraft.commands.Commands
+import net.minecraft.network.chat.Component
 import org.gabrielross.client.Client
 import org.gabrielross.client.model.EvolutionChainResponse
 import org.gabrielross.client.model.EvolvesTo
@@ -16,7 +26,7 @@ class Pokeinfo(val client: Client) {
     val ability: Ability = Ability(client)
     val move: Move = Move(client)
     val search: Search = Search(client)
-    val calculate: Calculator(client)
+    val calculate: Calculator = Calculator(client)
 
 //    fun calculateCandies(pokemonIdentifier: String, startLevel: Int, targetLevel: Int, candyInventory: CandyInventory = CandyInventory.max()): CandyCalculatorResponse {
 //        // Fetch pokemon growthrate from pokemon-species endpoint, then
@@ -35,6 +45,24 @@ class Pokeinfo(val client: Client) {
 //
 //        return ExperienceCalculator.calculateCandies(target.experience - start.experience, candyInventory)
 //    }
+
+    fun registerAllCommands(dispatcher: CommandDispatcher<CommandSourceStack>) {
+        val baseCmd = Commands.literal("pokeinfo")
+
+        baseCmd.then(getPokemon())
+        dispatcher.register(baseCmd)
+    }
+    fun registerPokemonCommands(dispatcher: CommandDispatcher<CommandSourceStack>) {
+
+    }
+    fun getPokemon(): LiteralArgumentBuilder<CommandSourceStack> {
+        return Commands.literal("pokemon")
+            .then(Commands.argument("identifier", StringArgumentType.greedyString())
+                .executes { ctx ->
+                    ctx.source.sendSystemMessage(Component.literal(pokemon.get(getString(ctx, "identifier")).toString()))
+                    1
+                })
+    }
 
     fun natureDoes(identifier: String): String {
         val nature = client.getNature(identifier)
