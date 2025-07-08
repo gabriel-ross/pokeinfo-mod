@@ -14,8 +14,15 @@ var XS_CANDY_VALUE = 100
 
 class Calculator(val client: Client) {
 
-    fun statValues(base: Stats, ivs: Stats, evs: Stats, nature: Nature): Stats {
-        //
+    fun statValues(base: Stats, ivs: Stats, evs: Stats, nature: Nature, level: Int = 100): Stats {
+        return Stats(
+            hp = hpStatValue(base.hp, ivs.hp, evs.hp, level),
+            atk = statValue(base.atk, ivs.atk, evs.atk, level, NatureModifier.lookup(nature, Stat.Attack)),
+            def = statValue(base.def, ivs.def, evs.def, level, NatureModifier.lookup(nature, Stat.Defense)),
+            spa = statValue(base.spa, ivs.spa, evs.spa, level, NatureModifier.lookup(nature, Stat.SpecialAttack)),
+            spd = statValue(base.spd, ivs.spd, evs.spd, level, NatureModifier.lookup(nature, Stat.SpecialDefense)),
+            spe = statValue(base.spe, ivs.spe, evs.spe, level, NatureModifier.lookup(nature, Stat.Speed)),
+        )
     }
 
     fun hpStatValue(base: Int, iv: Int, ev: Int, level: Int): Int {
