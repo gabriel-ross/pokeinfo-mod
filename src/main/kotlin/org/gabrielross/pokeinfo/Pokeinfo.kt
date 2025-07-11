@@ -52,6 +52,7 @@ class Pokeinfo(val client: Client) {
     fun buildCommandTree(): LiteralArgumentBuilder<CommandSourceStack> {
         val rootCmd = Commands.literal("pokeinfo")
 
+
         // Build pokemon command tree
         val pokemonCmd = cmdGetPokemon()
         pokemonCmd.then(cmdGetPokemonAbilities())
@@ -166,6 +167,13 @@ class Pokeinfo(val client: Client) {
                 })
     }
 
+    fun search(): LiteralArgumentBuilder<CommandSourceStack> {
+        return Commands.literal("search")
+            .then(argument("args", greedyString())
+                .executes { ctx ->
+                    printToChat(ctx.source, natureDoes(getString(ctx, "identifier")))
+                })
+    }
 
     fun natureDoes(identifier: String): String {
         val nature = client.getNature(identifier)
