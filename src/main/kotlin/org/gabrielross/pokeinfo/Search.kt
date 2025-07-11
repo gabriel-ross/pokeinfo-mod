@@ -89,48 +89,33 @@ class Search(val client: Client) {
     }
 
     fun haveAbility(identifier: String, filters: filters = filters(includeMega = true)): List<String> {
-        return fetchFilteredAbilitySet(identifier, filters).toList()
+        return filterPokemonset(fetchAbilityset(identifier), filters).toList()
     }
 
-    fun moveLearnsetIntersect(identifiers: String, filters: filters = filters()): List<String> {
-        return moveLearnsetIntersect(cleanPotentialListInput(identifiers).split(","), filters)
+    fun learnsMoves(identifiers: String, intersects: Boolean = true, filters: filters = filters()): List<String> {
+        return learnsMoves(cleanPotentialListInput(identifiers).split(","), intersects, filters)
     }
 
-    fun moveLearnsetIntersect(identifiers: List<String>, filters: filters = filters()): List<String> {
+    fun learnsMoves(identifiers: List<String>, intersects: Boolean, filters: filters = filters()): List<String> {
         if (identifiers.isEmpty()) {
             return emptyList()
         }
-        var learnset = fetchFilteredLearnset(identifiers[0], filters)
+        var learnset = fetchLearnset(identifiers[0])
         if (identifiers.size == 1) {
             return learnset.toList()
         }
 
-        identifiers.drop(1).forEach { it ->
-            learnset = learnset.intersect(fetchFilteredLearnset(it, filters))
+        if (intersects) {
+            identifiers.drop(1).forEach { it ->
+                learnset = learnset.intersect(fetchLearnset(it))
+            }
+        } else {
+            identifiers.drop(1).forEach { it ->
+                learnset = learnset.union(fetchLearnset(it))
+            }
         }
 
-        return learnset.toList()
-    }
-
-
-    fun moveLearnsetUnion(identifiers: String, filters: filters = filters()): List<String> {
-        return moveLearnsetUnion(cleanPotentialListInput(identifiers).split(","), filters)
-    }
-
-    fun moveLearnsetUnion(identifiers: List<String>, filters: filters = filters()): List<String> {
-        if (identifiers.isEmpty()) {
-            return emptyList()
-        }
-        var learnset = fetchFilteredLearnset(identifiers[0], filters)
-        if (identifiers.size == 1) {
-            return learnset.toList()
-        }
-
-        identifiers.drop(1).forEach { it ->
-            learnset = learnset.union(fetchFilteredLearnset(it, filters))
-        }
-
-        return learnset.toList()
+        return filterPokemonset(learnset, filters).toList()
     }
 
     private fun filterPokemonset(pokemon: Set<String>, filters: filters): Set<String> {
@@ -163,75 +148,4 @@ class Search(val client: Client) {
         client.getType(type).pokemon.forEach { haveType.add(it.pokemon.name) }
         return haveType
     }
-
-    private fun fetchFilteredTypeSet(
-        identifer: Type,
-        filters: filters = filters(
-            includeMega = false,
-            includeGmax = false
-        )): Set<String> {
-        var typeset = mutableSetOf<String>()
-        client.getType(identifer).pokemon.forEach { it ->
-            when {
-                it.pokemon.name.contains("-gmax") && filters.includeGmax -> typeset.add(it.pokemon.name)
-                it.pokemon.name.contains("-mega") && filters.includeMega -> typeset.add(it.pokemon.name)
-                filters.includeNFE -> typeset.add(it.pokemon.name)
-                else -> {
-                    val species = client.makeRequest<PokemonResponse>(it.pokemon.url).species.name
-                    if (pokemon.isFullyEvolved(species)) {
-                        typeset.add(it.pokemon.name)
-                    }
-                }
-            }
-        }
-        return typeset
-    }
-
-    private fun fetchFilteredAbilitySet(
-        identifer: String,
-        filters: filters = filters(
-            includeMega = false,
-            includeGmax = false
-        )): Set<String> {
-        var learnset = mutableSetOf<String>()
-        client.getAbility(cleanNameInput(identifer)).pokemon.forEach { it ->
-            when {
-                it.pokemon.name.contains("-gmax") && filters.includeGmax -> learnset.add(it.pokemon.name)
-                it.pokemon.name.contains("-mega") && filters.includeMega -> learnset.add(it.pokemon.name)
-                filters.includeNFE -> learnset.add(it.pokemon.name)
-                else -> {
-                    val species = client.makeRequest<PokemonResponse>(it.pokemon.url).species.name
-                    if (pokemon.isFullyEvolved(species)) {
-                        learnset.add(it.pokemon.name)
-                    }
-                }
-            }
-        }
-        return learnset
-    }
-
-    private fun fetchFilteredLearnset(
-        identifer: String,
-        filters: filters = filters(
-            includeMega = false,
-            includeGmax = false
-        )): Set<String> {
-        var learnset = mutableSetOf<String>()
-        client.getMove(cleanNameInput(identifer)).learned_by_pokemon.forEach { it ->
-            when {
-                it.name.contains("-gmax") && filters.includeGmax -> learnset.add(it.name)
-                it.name.contains("-mega") && filters.includeMega -> learnset.add(it.name)
-                filters.includeNFE -> learnset.add(it.name)
-                else -> {
-                    val species = client.makeRequest<PokemonResponse>(it.url).species.name
-                    if (pokemon.isFullyEvolved(species)) {
-                        learnset.add(it.name)
-                    }
-                }
-            }
-        }
-        return learnset
-    }
-
-
 }

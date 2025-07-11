@@ -50,7 +50,9 @@ class Pokeinfo(val client: Client) {
 
     // Builds the command tree and returns the root command
     fun buildCommandTree(): LiteralArgumentBuilder<CommandSourceStack> {
-        val rootCmd = Commands.literal("pokeinfo")
+        val rootCmd = Commands.literal("pokeinfo").executes { ctx ->
+            printToChat(ctx.source, pokeinfoUsage)
+        }
 
 
         // Build pokemon command tree
@@ -69,11 +71,19 @@ class Pokeinfo(val client: Client) {
         val moveCmd = cmdGetMove()
         moveCmd.then(cmdGetMoveEffect())
 
+        // Build search command tree
+        val searchCmd = cmdSearch()
+        searchCmd.then(cmdSearchLearnsMoves())
+        searchCmd.then(cmdSearchLearnsMovesUnion())
+        searchCmd.then(cmdSearchHaveAbility())
+
         // Append subcommands to root command
         rootCmd.then(pokemonCmd)
         rootCmd.then(abilityCmd)
         rootCmd.then(moveCmd)
         rootCmd.then(cmdGetNature())
+        rootCmd.then(cmdSearch())
+
 
         return rootCmd
     }
@@ -167,11 +177,35 @@ class Pokeinfo(val client: Client) {
                 })
     }
 
-    fun search(): LiteralArgumentBuilder<CommandSourceStack> {
+    fun cmdSearch(): LiteralArgumentBuilder<CommandSourceStack> {
         return Commands.literal("search")
             .then(argument("args", greedyString())
                 .executes { ctx ->
-                    printToChat(ctx.source, natureDoes(getString(ctx, "identifier")))
+                    printToChat(ctx.source, search.pokemon(getString(ctx, "args")).toString())
+                })
+            .executes { ctx ->
+                printToChat(ctx.source, searchUsage)
+            }
+    }
+    fun cmdSearchLearnsMoves(): LiteralArgumentBuilder<CommandSourceStack> {
+        return Commands.literal("learns")
+            .then(argument("identifiers", greedyString())
+                .executes { ctx ->
+                    printToChat(ctx.source, search.learnsMoves(getString(ctx, "identifiers"), intersects = true).toString())
+                })
+    }
+    fun cmdSearchLearnsMovesUnion(): LiteralArgumentBuilder<CommandSourceStack> {
+        return Commands.literal("learnsAnyOf")
+            .then(argument("identifiers", greedyString())
+                .executes { ctx ->
+                    printToChat(ctx.source, search.learnsMoves(getString(ctx, "identifiers"), intersects = false).toString())
+                })
+    }
+    fun cmdSearchHaveAbility(): LiteralArgumentBuilder<CommandSourceStack> {
+        return Commands.literal("ability")
+            .then(argument("identifier", greedyString())
+                .executes { ctx ->
+                    printToChat(ctx.source, search.haveAbility(getString(ctx, "identifier")).toString())
                 })
     }
 
@@ -179,5 +213,30 @@ class Pokeinfo(val client: Client) {
         val nature = client.getNature(identifier)
         return "$identifier: +${nature.increased_stat.name} -${nature.decreased_stat.name}"
     }
-
 }
+
+private val pokeinfoUsage = """
+    Pokeinfo is a tool for quickly looking up pokemon data
+    
+    Formatting:
+    * List inputs are comma-delimited with no spaces between arguments
+    * Spaces within identifier names should be replaced with hyphens (ex. great tusk -> great-tusk)
+    * Alternate pokemon forms (like regional forms and megas) appended to the name 
+    (ex. alolan ninetales -> ninetales-alola or mega scizor -> scizor-mega)
+    
+    Subcommands:
+    pokemon: get info on a pokemon
+    ability: get info on an ability
+    move: get info on an move
+    search: search for pokemon by ability, learnset, or type (anything that would return a list of pokemon really)
+""".trimIndent()
+
+private val searchUsage = """
+    Usage: search [ability] [move | moves] [type | types] {--includeGmax} {--includeMega} {--includeNFE}
+    Example: search ability=technician moves=swords-dance,bullet-punch type=steel --includeGmax=false --includeMega=true
+    
+    Description:
+    Used for searching for pokemon by ability, move learnset, and/or type.
+    Also provides subcommands for searching by one of the aforemementioned parameters,
+    however these subcommands do not permit flags.
+""".trimIndent()
