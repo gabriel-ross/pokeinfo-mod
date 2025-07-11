@@ -19,10 +19,10 @@ object PokeinfoMod : ModInitializer {
         val baseHTTPClient = OkHttpClient()
         val baseUrl = "https://pokeapi.co/api/v2"
 
-        val pokeinfo = Pokeinfo(Client(baseUrl, baseHTTPClient))
+        val pokeinfo = Pokeinfo(Client(baseHTTPClient, baseUrl))
 
         CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
-            pokeinfo.registerAllCommands(dispatcher)
+            dispatcher.register(pokeinfo.buildCommandTree())
         }
 //
 //        CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->

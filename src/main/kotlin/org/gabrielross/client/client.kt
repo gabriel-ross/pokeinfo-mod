@@ -14,8 +14,8 @@ val UnmarshalStrategy = Json {
 }
 
 class Client constructor(
+    httpClient: OkHttpClient,
     baseUrl: String,
-    httpClient: OkHttpClient
 ) {
     val baseUrl = baseUrl
     val httpClient = httpClient
@@ -55,7 +55,7 @@ class Client constructor(
 
     fun getType(type: Type): TypeResponse {
         return UnmarshalStrategy.decodeFromString<TypeResponse>(
-            this.makePokeAPIRequest("${this.baseUrl}/${this.typeEndpoint}/$type").string()
+            this.makePokeAPIRequest("${this.typeEndpoint}/$type").string()
         )
     }
 

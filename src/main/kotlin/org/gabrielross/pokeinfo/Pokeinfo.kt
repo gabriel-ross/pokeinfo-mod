@@ -1,5 +1,6 @@
 package org.gabrielross.pokeinfo
 
+import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType.getString
 import com.mojang.brigadier.arguments.StringArgumentType.greedyString
 import com.mojang.brigadier.arguments.StringArgumentType.string
@@ -7,6 +8,7 @@ import net.minecraft.commands.Commands.argument
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import com.mojang.brigadier.context.CommandContext
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
 import net.minecraft.network.chat.Component
@@ -46,22 +48,76 @@ class Pokeinfo(val client: Client) {
 //        return ExperienceCalculator.calculateCandies(target.experience - start.experience, candyInventory)
 //    }
 
-    fun registerAllCommands(dispatcher: CommandDispatcher<CommandSourceStack>) {
-        val baseCmd = Commands.literal("pokeinfo")
+//    // Builds the command tree and registers all commands to the provided dispatcher
+//    fun buildAndRegisterCommands(dispatcher: CommandDispatcher<CommandSourceStack>) {
+    // Builds the command tree and returns the root command
+    fun buildCommandTree(): LiteralArgumentBuilder<CommandSourceStack> {
+        val rootCmd = Commands.literal("pokeinfo")
 
-        baseCmd.then(getPokemon())
-        dispatcher.register(baseCmd)
-    }
-    fun registerPokemonCommands(dispatcher: CommandDispatcher<CommandSourceStack>) {
+        // Append pokemon subcommands to top-level pokemon command
+        val pokemonCmd = cmdGetPokemon()
+        pokemonCmd.then(cmdGetPokemonAbilities())
+        pokemonCmd.then(cmdPokemonCanLearnMove())
+        pokemonCmd.then(cmdGetPokemonEVYield())
+        pokemonCmd.then(cmdPokemonAllBreedsWith())
+        pokemonCmd.then(cmdPokemonCanBreed())
 
+
+        // Append top-level subcommands (pokemon, moves, abilities, search) to root command
+        rootCmd.then(pokemonCmd)
+
+        return rootCmd
+        // Register base command after building command tree
+//        dispatcher.register(baseCmd)
     }
-    fun getPokemon(): LiteralArgumentBuilder<CommandSourceStack> {
+    fun cmdGetPokemon(): LiteralArgumentBuilder<CommandSourceStack> {
         return Commands.literal("pokemon")
-            .then(Commands.argument("identifier", StringArgumentType.greedyString())
+            .then(argument("identifier", greedyString())
                 .executes { ctx ->
-                    ctx.source.sendSystemMessage(Component.literal(pokemon.get(getString(ctx, "identifier")).toString()))
-                    1
+                    printToChat(ctx.source, pokemon.get(getString(ctx, "identifier")).toString())
                 })
+    }
+    fun cmdGetPokemonAbilities(): LiteralArgumentBuilder<CommandSourceStack> {
+        return Commands.literal("abilities")
+            .then(argument("identifier", greedyString())
+                .executes { ctx ->
+                    printToChat(ctx.source, pokemon.get(getString(ctx, "identifier")).abilities.toString())
+            })
+    }
+    fun cmdPokemonCanLearnMove(): LiteralArgumentBuilder<CommandSourceStack> {
+        return Commands.literal("learns")
+            .then(argument("pokemon", string())
+                    .then(argument("move", string())
+                        .executes { ctx ->
+                            printToChat(ctx.source, pokemon.learnsMove(getString(ctx, "pokemon"), getString(ctx, "move")).toString())
+                        }
+                    ))
+    }
+    fun cmdGetPokemonEVYield(): LiteralArgumentBuilder<CommandSourceStack> {
+        return Commands.literal("evyield")
+            .then(argument("identifier", greedyString())
+                .executes { ctx ->
+                    printToChat(ctx.source, pokemon.get(getString(ctx, "identifier")).evYield.toString())
+                })
+    }
+    fun cmdPokemonAllBreedsWith(): LiteralArgumentBuilder<CommandSourceStack> {
+        return Commands.literal("breedgroup")
+            .then(argument("identifier", greedyString())
+                .executes { ctx ->
+                    printToChat(ctx.source, pokemon.allBreedsWith(getString(ctx, "identifier")).toString())
+                })
+    }
+    fun cmdPokemonCanBreed(): LiteralArgumentBuilder<CommandSourceStack> {
+        return Commands.literal("canbreed")
+                .then(argument("identifier1", string())
+                    .then(argument("identifier2", string())
+                    .executes { ctx ->
+                        printToChat(ctx.source, pokemon.canBreed(getString(ctx, "identifier1"), getString(ctx, "identifier2")).toString())
+                    }))
+    }
+    fun printToChat(ctx: CommandSourceStack, msg: String): Int {
+        ctx.sendSystemMessage(Component.literal(msg))
+        return 1
     }
 
     fun natureDoes(identifier: String): String {

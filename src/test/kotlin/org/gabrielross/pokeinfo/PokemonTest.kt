@@ -12,7 +12,7 @@ class PokemonTest {
     fun setup(): Pokemon {
         val baseHTTPClient = OkHttpClient()
         val baseUrl = "https://pokeapi.co/api/v2"
-        return Pokemon(Client(baseUrl, baseHTTPClient))
+        return Pokemon(Client(baseHTTPClient, baseUrl))
     }
 
     @Test
@@ -48,7 +48,7 @@ class PokemonTest {
 
     @Test
     fun testAllBreedsWith() {
-        val cl = Client("https://pokeapi.co/api/v2", OkHttpClient())
+        val cl = Client( OkHttpClient(), "https://pokeapi.co/api/v2")
         val app = Pokemon(cl)
 
         var expectedPokemon = mutableSetOf<String>()
