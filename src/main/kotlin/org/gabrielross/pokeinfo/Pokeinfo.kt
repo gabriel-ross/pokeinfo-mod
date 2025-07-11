@@ -48,13 +48,11 @@ class Pokeinfo(val client: Client) {
 //        return ExperienceCalculator.calculateCandies(target.experience - start.experience, candyInventory)
 //    }
 
-//    // Builds the command tree and registers all commands to the provided dispatcher
-//    fun buildAndRegisterCommands(dispatcher: CommandDispatcher<CommandSourceStack>) {
     // Builds the command tree and returns the root command
     fun buildCommandTree(): LiteralArgumentBuilder<CommandSourceStack> {
         val rootCmd = Commands.literal("pokeinfo")
 
-        // Append pokemon subcommands to top-level pokemon command
+        // Build pokemon command tree
         val pokemonCmd = cmdGetPokemon()
         pokemonCmd.then(cmdGetPokemonAbilities())
         pokemonCmd.then(cmdPokemonCanLearnMove())
@@ -62,14 +60,28 @@ class Pokeinfo(val client: Client) {
         pokemonCmd.then(cmdPokemonAllBreedsWith())
         pokemonCmd.then(cmdPokemonCanBreed())
 
+        // Build ability command tree
+        val abilityCmd = cmdGetAbility()
+        abilityCmd.then(cmdGetAbilityEffect())
 
-        // Append top-level subcommands (pokemon, moves, abilities, search) to root command
+        // Build move command tree
+        val moveCmd = cmdGetMove()
+        moveCmd.then(cmdGetMoveEffect())
+
+        // Append subcommands to root command
         rootCmd.then(pokemonCmd)
+        rootCmd.then(abilityCmd)
+        rootCmd.then(moveCmd)
+        rootCmd.then(cmdGetNature())
 
         return rootCmd
-        // Register base command after building command tree
-//        dispatcher.register(baseCmd)
     }
+
+    fun printToChat(ctx: CommandSourceStack, msg: String): Int {
+        ctx.sendSystemMessage(Component.literal(msg))
+        return 1
+    }
+
     fun cmdGetPokemon(): LiteralArgumentBuilder<CommandSourceStack> {
         return Commands.literal("pokemon")
             .then(argument("identifier", greedyString())
@@ -115,10 +127,45 @@ class Pokeinfo(val client: Client) {
                         printToChat(ctx.source, pokemon.canBreed(getString(ctx, "identifier1"), getString(ctx, "identifier2")).toString())
                     }))
     }
-    fun printToChat(ctx: CommandSourceStack, msg: String): Int {
-        ctx.sendSystemMessage(Component.literal(msg))
-        return 1
+
+    fun cmdGetAbility(): LiteralArgumentBuilder<CommandSourceStack> {
+        return Commands.literal("ability")
+            .then(argument("identifier", greedyString())
+                .executes { ctx ->
+                    printToChat(ctx.source, ability.get(getString(ctx, "identifier")).toString())
+                })
     }
+    fun cmdGetAbilityEffect(): LiteralArgumentBuilder<CommandSourceStack> {
+        return Commands.literal("effect")
+            .then(argument("identifier", greedyString())
+                .executes { ctx ->
+                    printToChat(ctx.source, ability.get(getString(ctx, "identifier")).shortEffect)
+                })
+    }
+
+    fun cmdGetMove(): LiteralArgumentBuilder<CommandSourceStack> {
+        return Commands.literal("ability")
+            .then(argument("identifier", greedyString())
+                .executes { ctx ->
+                    printToChat(ctx.source, move.get(getString(ctx, "identifier")).toString())
+                })
+    }
+    fun cmdGetMoveEffect(): LiteralArgumentBuilder<CommandSourceStack> {
+        return Commands.literal("effect")
+            .then(argument("identifier", greedyString())
+                .executes { ctx ->
+                    printToChat(ctx.source, move.get(getString(ctx, "identifier")).shortEffect)
+                })
+    }
+
+    fun cmdGetNature(): LiteralArgumentBuilder<CommandSourceStack> {
+        return Commands.literal("nature")
+            .then(argument("identifier", greedyString())
+                .executes { ctx ->
+                    printToChat(ctx.source, natureDoes(getString(ctx, "identifier")))
+                })
+    }
+
 
     fun natureDoes(identifier: String): String {
         val nature = client.getNature(identifier)
