@@ -28,6 +28,14 @@ data class Ability(
             )
         }
     }
+
+    override fun toString(): String {
+        return """
+            id: $id
+            name: $name
+            effect: $shortEffect
+        """.trimIndent()
+    }
 }
 
 

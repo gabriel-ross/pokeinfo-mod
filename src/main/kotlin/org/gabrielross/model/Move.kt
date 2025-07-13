@@ -43,7 +43,17 @@ data class Move(
         }
 }
     override fun toString(): String {
-        return "id: ${this.id}\nname: ${this.name}\npriority: ${this.priority}\naccuracy: ${this.accuracy}\npower: ${this.power}\npp: ${this.pp}\ndamageClass: ${this.damageClass}\ntype: ${this.type}\neffect: ${this.shortEffect}\n"
+        return """
+            id: $id
+            name: $name
+            priority: $priority
+            accuracy: $accuracy
+            power: $power
+            pp: $pp
+            damageClass: $damageClass
+            type: $type
+            effect: $shortEffect
+        """.trimIndent()
     }
 }
 

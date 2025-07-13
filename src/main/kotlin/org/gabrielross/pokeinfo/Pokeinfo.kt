@@ -9,6 +9,7 @@ import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
+import net.minecraft.ChatFormatting
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
 import net.minecraft.network.chat.Component
@@ -89,7 +90,7 @@ class Pokeinfo(val client: Client) {
     }
 
     fun printToChat(ctx: CommandSourceStack, msg: String): Int {
-        ctx.sendSystemMessage(Component.literal(msg))
+        ctx.sendSystemMessage(Component.literal(msg).withStyle(ChatFormatting.GRAY))
         return 1
     }
 

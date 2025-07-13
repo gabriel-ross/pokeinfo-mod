@@ -15,12 +15,11 @@ data class Pokemon(
     val id: Int,
     val name: String,
     val baseStats: Stats,
-    val abilities: List<PokemonAbility> = emptyList<PokemonAbility>(),
-    val moves: List<PokemonMove> = emptyList<PokemonMove>(),
+    val abilities: List<PokemonAbility> = emptyList(),
+    val moves: List<PokemonMove> = emptyList(),
     val evYield: Stats = Stats(),
     val type1: Type,
     val type2: Type?,
-    val speciesData: Species?
 ) {
     companion object {
         fun fromResponseData(data: PokemonResponse): Pokemon {
@@ -85,9 +84,20 @@ data class Pokemon(
                 moves = emptyList<PokemonMove>(),
                 type1 = type1,
                 type2 = type2,
-                speciesData = null
             )
         }
+    }
+
+    override fun toString(): String {
+        return """
+            id: $id
+            name: $name
+            primary type: $type1
+            secondary type: $type2
+            base stats: $baseStats
+            abilities: $abilities
+            ev yield: $evYield
+        """.trimIndent()
     }
 }
 
@@ -115,6 +125,17 @@ data class Species(
                 growthRate = data.growth_rate.name
             )
         }
+    }
+
+    override fun toString(): String {
+        return """
+            id: $id
+            name: $name
+            egg group 1: $eggGroup1
+            egg group 2: $eggGroup2
+            growth rate: $growthRate
+            capture rate: $captureRate
+        """.trimIndent()
     }
 }
 
