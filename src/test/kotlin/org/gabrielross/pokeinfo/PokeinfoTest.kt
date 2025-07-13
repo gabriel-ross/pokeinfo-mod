@@ -1,5 +1,6 @@
 package org.gabrielross.pokeinfo
 
+import io.github.cdimascio.dotenv.Dotenv
 import okhttp3.OkHttpClient
 import org.gabrielross.client.Client
 import org.gabrielross.client.model.EvolutionChainResponse
@@ -9,6 +10,13 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class PokeinfoTest {
+
+    @Test
+    fun demo() {
+        val dotenv = Dotenv.load()
+        println(dotenv.get("POKEMON_VERSION"))
+    }
+
 //    fun setup(): Pokeinfo {
 //        val baseHTTPClient = OkHttpClient()
 //        val baseUrl = "https://pokeapi.co/api/v2"
