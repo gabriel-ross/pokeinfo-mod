@@ -64,8 +64,8 @@ class SearchTest {
     @Test
     fun testLearnsetIntersection() {
         val s = setup()
-        println(s.moveLearnsetIntersect("draining-kiss,calm-mind,stored-power"))
-        println(s.moveLearnsetIntersect("bulk-up,drain-punch"))
+        println(s.learnsMoves("draining-kiss,calm-mind,stored-power", intersects = true))
+        println(s.learnsMoves("bulk-up,drain-punch", intersects = true))
     }
 
     @Test

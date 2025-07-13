@@ -16,11 +16,20 @@ class Pokemon(val client: Client) {
     // fetch pokemon data using id.
     //
     // Accepts either pokemon name or id as identifier.
-    fun get(identifier: String): PokemonModel {
-        return try {
-            PokemonModel.fromResponseData(client.getPokemon(identifier))
-        } catch (e: IOException) {
-            PokemonModel.fromResponseData(client.getPokemon(client.getPokemonSpecies(identifier).id.toString()))
+    fun get(identifier: String, detailedResponse: Boolean = false): PokemonModel {
+        if (detailedResponse) {
+            return try {
+                PokemonModel.fromResponseData(client.getPokemon(identifier), client.getPokemonSpecies(identifier))
+            } catch (e: IOException) {
+                val speciesResponse = client.getPokemonSpecies(identifier)
+                PokemonModel.fromResponseData(client.getPokemon(speciesResponse.id.toString()), speciesResponse)
+            }
+        } else {
+            return try {
+                PokemonModel.fromResponseData(client.getPokemon(identifier))
+            } catch (e: IOException) {
+                PokemonModel.fromResponseData(client.getPokemon(client.getPokemonSpecies(identifier).id.toString()))
+            }
         }
     }
 
@@ -163,4 +172,21 @@ data class LearnableMove(
     var learnsByBreeding: Boolean = false,
     var learnsByPriorEvolution: Boolean = false,
     var priorEvoLearnMethod: LearnableMove? = null
-)
+) {
+    override fun toString(): String {
+        if (!canLearnMove) {
+            return "$pokemon cannot learn $move by any known methods"
+        }
+        return """
+            pokemon: $pokemon
+            move: $move
+            learns at level: $levelLearnedAt
+            learns via level-up: $learnsByLevelUp
+            learns upon evolution: $learnsByEvolution
+            learns from tm: $learnsByMachine
+            learns via egg move: $learnsByBreeding
+            learns from prior evolution: $learnsByPriorEvolution
+           prior evolution learn method: $priorEvoLearnMethod
+        """.trimIndent()
+    }
+}

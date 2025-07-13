@@ -96,6 +96,12 @@ class Pokeinfo(val client: Client) {
 
     fun cmdGetPokemon(): LiteralArgumentBuilder<CommandSourceStack> {
         return Commands.literal("pokemon")
+            .then(Commands.literal("detailed")
+                .then(argument("identifier", greedyString())
+                    .executes { ctx ->
+                        printToChat(ctx.source, pokemon.get(getString(ctx, "identifier"), true).toString())
+                    }
+                ))
             .then(argument("identifier", greedyString())
                 .executes { ctx ->
                     printToChat(ctx.source, pokemon.get(getString(ctx, "identifier")).toString())
@@ -217,6 +223,7 @@ class Pokeinfo(val client: Client) {
 }
 
 private val pokeinfoUsage = """
+    Description:
     Pokeinfo is a tool for quickly looking up pokemon data
     
     Formatting:
@@ -232,12 +239,25 @@ private val pokeinfoUsage = """
     search: search for pokemon by ability, learnset, or type (anything that would return a list of pokemon really)
 """.trimIndent()
 
-private val searchUsage = """
-    Usage: search [ability] [move | moves] [type | types] {--includeGmax} {--includeMega} {--includeNFE}
-    Example: search ability=technician moves=swords-dance,bullet-punch type=steel --includeGmax=false --includeMega=true
-    
+private val pokemonUsage = """
     Description:
+    The pokemon command provides detailed info on specific pokemon
+    
+    Usage:
+    pokemon {identifier}
+    
+    Subcommands & usage:
+    detailed {identifier}: provides the additional data for egg group(s), growth rate, and capture rate
+    learns {pokemon} {move}: returns the ways in which a pokemon can learn a given move
+""".trimIndent()
+
+private val searchUsage = """
+        Description:
     Used for searching for pokemon by ability, move learnset, and/or type.
     Also provides subcommands for searching by one of the aforemementioned parameters,
     however these subcommands do not permit flags.
+    
+    Usage: search [ability] [move | moves] [type | types] {--includeGmax} {--includeMega} {--includeNFE}
+    Example: search ability=technician moves=swords-dance,bullet-punch type=steel --includeGmax=false --includeMega=true
+   
 """.trimIndent()

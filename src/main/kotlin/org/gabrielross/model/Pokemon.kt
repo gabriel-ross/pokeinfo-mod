@@ -20,9 +20,10 @@ data class Pokemon(
     val evYield: Stats = Stats(),
     val type1: Type,
     val type2: Type?,
+    val species: Species?,
 ) {
     companion object {
-        fun fromResponseData(data: PokemonResponse): Pokemon {
+        fun fromResponseData(data: PokemonResponse, speciesData: SpeciesResponse? = null): Pokemon {
             var abilities = mutableListOf<PokemonAbility>()
             data.abilities.forEach { ability ->
                 abilities.add(PokemonAbility(ability.ability.name, ability.is_hidden))
@@ -75,6 +76,11 @@ data class Pokemon(
                 }
             }
 
+            var species: Species? = null
+            if (speciesData != null) {
+                species = Species.fromResponse(speciesData)
+            }
+
             return Pokemon(
                 id = data.id,
                 name = data.name,
@@ -84,6 +90,7 @@ data class Pokemon(
                 moves = emptyList<PokemonMove>(),
                 type1 = type1,
                 type2 = type2,
+                species = species
             )
         }
     }
