@@ -13,7 +13,8 @@ data class SpeciesResponse(
     val evolution_chain: EvolutionChain,
     val egg_groups: List<ShortEntry<EggGroup>>,
     val growth_rate: SpeciesGrowthRate,
-    val pokedex_numbers: List<PokedexEntry>
+    val pokedex_numbers: List<PokedexEntry>,
+    val varieties: List<Varieties>
 )
 
 @Serializable
@@ -29,4 +30,10 @@ data class SpeciesGrowthRate(
 data class PokedexEntry(
     val entry_number: Int,
     val pokedex: ShortEntry<String>
+)
+
+@Serializable
+data class Varieties(
+    val is_default: Boolean,
+    val pokemon: ShortEntry<String>
 )

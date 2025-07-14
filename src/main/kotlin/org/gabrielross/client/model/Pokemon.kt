@@ -12,7 +12,9 @@ data class PokemonResponse(
     val moves: List<Move>,
     val species: ShortEntry<String>,
     val stats: List<Stat>,
-    val types: List<PokemonType>
+    val types: List<PokemonType>,
+    val order: Int,
+    val is_default: Boolean,
 )
 
 @Serializable
