@@ -15,6 +15,7 @@ class PokeinfoTest {
     fun demo() {
         val dotenv = Dotenv.load()
         println(dotenv.get("POKEMON_VERSION"))
+        println(dotenv["POKEMON_VERSION"])
     }
 
 //    fun setup(): Pokeinfo {
